@@ -1,6 +1,6 @@
 # OpDEA
 
-## installation
+## Installation
 OpDEA is a R shiny application for:
 1. presenting results of our benchmarking of proteomics data differential expression analysis workflow;
 2. guiding users to select optimal workflows for analyzing their proteomics data;
@@ -26,4 +26,16 @@ Then, the shiny app can be lanched via:
 
 OpDEA::run_app()
 
-## Required R package
+## Requirements for installation of OpDEA
+R base: R-4.1.2 or higher;
+R packages: shiny 1.7.4 or higher; shinydashboard 0.7.2 or higher; threejs; DT; ggplot2; reshape2; ggpubr; ggsci; readxl; ggalluvial
+
+## webserver
+We prepared a freely-accessible webserver for helping users using OpDEA without install the packages, see http://13.251.156.225:3838/OpDEA_test/
+
+## Contact
+Any problems or requesting source codes for reproducing results in our paper please contact 
+    Hui Peng: hui.peng@ntu.edu.sg
+	Wilson Wen Bin Goh: wilsongoh@ntu.edu.sg
+
+golem (); 
