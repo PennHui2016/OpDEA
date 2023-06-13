@@ -34,7 +34,9 @@ R packages: shiny 1.7.4 or higher; shinydashboard 0.7.2 or higher; threejs; DT; 
 We prepared a freely-accessible webserver for helping users using OpDEA without install the packages, see http://13.251.156.225:3838/OpDEA_test/
 
 ## Contact
-Any problems or requesting source codes for reproducing results in our paper please contact 
+Any problems or requesting source codes for reproducing results in our paper please contact
+
     Hui Peng: hui.peng@ntu.edu.sg
-	Wilson Wen Bin Goh: wilsongoh@ntu.edu.sg
+
+    Wilson Wen Bin Goh: wilsongoh@ntu.edu.sg
 
