@@ -19,7 +19,9 @@ It can be installed via two ways:
 2. using devtools to install this package:
 
    install.packages("devtools")
+   
    library(devtools)
+   
    install_github("PennHui2016/OpDEA")
 
 Then, the shiny app can be lanched via:
@@ -36,7 +38,5 @@ We prepared a freely-accessible webserver for helping users using OpDEA without 
 ## Contact
 Any problems or requesting source codes for reproducing results in our paper please contact
 
-    Hui Peng: hui.peng@ntu.edu.sg
-
-    Wilson Wen Bin Goh: wilsongoh@ntu.edu.sg
+    Hui Peng: hui.peng@ntu.edu.sg;  Wilson Wen Bin Goh: wilsongoh@ntu.edu.sg
 
