@@ -7,7 +7,7 @@ Authors@R:
            role = c("aut", "cre"),
            email = "hui.peng@ntu.edu.sg")
 Description: This is a shiny app for presenting proteomics data differential express analysis workflows and for guiding users to select optimal workflows to analyze their own proteomics data.
-License: What license is it under?
+License: GPL (>= 2)
 Imports: 
     config (>= 0.3.1),
     golem (>= 0.4.0),
