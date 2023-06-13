@@ -24,7 +24,7 @@ It can be installed via two ways:
    
    install_github("PennHui2016/OpDEA")
 
-Then, the shiny app can be lanched via:
+Then, the shiny app can be launched via:
 
 OpDEA::run_app()
 
