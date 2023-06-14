@@ -6,9 +6,9 @@ OpDEA is a R shiny application for:
 2. guiding users to select optimal workflows for analyzing their proteomics data;
 3. providing links for downloading datasets used for benchmarking and for downloading our results.
 
-It can be installed via downloading **"OpDEA_0.0.0.9000.tar.gz"** from this site, then install with the following command:
+It can be installed via downloading **"OpDEA_0.0.0.9000.tar.gz"** from this site, then installed with the following command:
     
-    install.packages(pkgs = './OpDEA_0.0.0.9000.tar.gz', lib = .libPaths()[length(.libPaths())], repos = NULL, dependencies = T)
+    install.packages(pkgs = 'OpDEA_0.0.0.9000.tar.gz', lib = .libPaths()[length(.libPaths())], repos = NULL, dependencies = T)
 
 Then, the shiny app can be launched via:
 
