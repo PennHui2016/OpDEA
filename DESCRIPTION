@@ -2,12 +2,12 @@ Package: OpDEA
 Title: An Amazing Shiny App
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "firstname",
-           family = "lastname",
+    person(given = "Hui",
+           family = "Peng",
            role = c("aut", "cre"),
-           email = "your@email.com")
-Description: What the package does (one paragraph).
-License: What license is it under?
+           email = "hui.peng@ntu.edu.sg")
+Description: This is a shiny app for presenting proteomics data differential express analysis workflows and for guiding users to select optimal workflows to analyze their own proteomics data.
+License: GPL (>= 2)
 Imports: 
     config (>= 0.3.1),
     golem (>= 0.4.0),
