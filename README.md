@@ -6,7 +6,7 @@ OpDEA is a R shiny application for:
 2. guiding users to select optimal workflows for analyzing their proteomics data;
 3. providing links for downloading datasets used for benchmarking and for downloading our results.
 
-It can be installed via downloading <b>"OpDEA_0.0.0.9000.tar.gz"<b> from this site, then install with the following command:
+It can be installed via downloading **"OpDEA_0.0.0.9000.tar.gz"** from this site, then install with the following command:
     
     install.packages(pkgs = './OpDEA_0.0.0.9000.tar.gz', lib = .libPaths()[length(.libPaths())], repos = NULL, dependencies = T)
 
@@ -22,7 +22,7 @@ R packages: shiny 1.7.4 or higher; shinydashboard 0.7.2 or higher; threejs; DT; 
 We prepared a freely-accessible webserver for helping users using OpDEA without install the packages, see http://www.ai4pro.tech:3838/OpDEA_test/
 
 ## source codes for proteomics data differential expression analysis workflow benchmarking
-The python and R source codes for benchmarking proteomics data differential expression analysis workflows are located in the folder <b>"source_codes_for_benchmarking"<b>.
+The python and R source codes for benchmarking proteomics data differential expression analysis workflows are located in the folder **"source_codes_for_benchmarking"**.
 
 ## Contact
 Any problems or requesting source codes for reproducing results in our paper please contact
