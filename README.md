@@ -12,14 +12,14 @@ It can be installed via downloading **"OpDEA_0.0.0.9000.tar.gz"** from this site
 
 Then, the shiny app can be launched via:
 
-OpDEA::run_app()
+    OpDEA::run_app()
 
 ## Requirements for installation of OpDEA
 R base: R-4.1.2 or higher;
 R packages: shiny 1.7.4 or higher; shinydashboard 0.7.2 or higher; threejs; DT; ggplot2; reshape2; ggpubr; ggsci; readxl; ggalluvial
 
 ## webserver
-We prepared a freely-accessible webserver for helping users using OpDEA without install the packages, see http://www.ai4pro.tech:3838/OpDEA_test/
+We prepared a freely-accessible webserver for helping users to use OpDEA without installation of the package, see http://www.ai4pro.tech:3838/OpDEA_test/.
 
 ## source codes for proteomics data differential expression analysis workflow benchmarking
 The python and R source codes for benchmarking proteomics data differential expression analysis workflows are located in the folder **"source_codes_for_benchmarking"**.
