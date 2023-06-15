@@ -1,0 +1,25 @@
+0.44166666666666665,frozenset({'norm'})
+0.38333333333333336,frozenset({'ROTS'})
+0.3125,frozenset({'No_norm'})
+0.1125,frozenset({'QRILC'})
+0.5083333333333333,frozenset({'pro_LFQ'})
+0.11666666666666667,frozenset({'MinProb'})
+0.12083333333333333,frozenset({'MinDet'})
+0.1,frozenset({'bpca'})
+0.1,frozenset({'MLE'})
+0.37083333333333335,frozenset({'limma'})
+0.24166666666666667,frozenset({'center.mean'})
+0.20416666666666666,frozenset({'quantiles'})
+0.24166666666666667,frozenset({'center.median'})
+0.18333333333333332,frozenset({'proDA'})
+0.16666666666666666,"frozenset({'ROTS', 'norm'})"
+0.16666666666666666,"frozenset({'ROTS', 'pro_LFQ'})"
+0.12916666666666668,"frozenset({'norm', 'No_norm'})"
+0.17083333333333334,"frozenset({'No_norm', 'pro_LFQ'})"
+0.18333333333333332,"frozenset({'limma', 'pro_LFQ'})"
+0.1875,"frozenset({'norm', 'limma'})"
+0.11666666666666667,"frozenset({'center.mean', 'pro_LFQ'})"
+0.1125,"frozenset({'center.mean', 'norm'})"
+0.10416666666666667,"frozenset({'quantiles', 'pro_LFQ'})"
+0.11666666666666667,"frozenset({'center.median', 'pro_LFQ'})"
+0.1125,"frozenset({'norm', 'center.median'})"
