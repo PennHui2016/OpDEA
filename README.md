@@ -12,6 +12,7 @@ It can be installed via downloading **"OpDEA_0.0.0.9000.tar.gz"** from this site
 
 Then, the shiny app can be launched via:
 
+    library(shinydashboard)
     OpDEA::run_app()
 
 ## Requirements for installation of OpDEA
