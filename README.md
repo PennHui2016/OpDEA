@@ -17,7 +17,7 @@ Then, the shiny app can be launched via:
 
 ## Requirements for installation of OpDEA
 R base: R-4.1.2 or higher;
-R packages: shiny 1.7.4 or higher; shinydashboard 0.7.2 or higher; threejs; DT; ggplot2; reshape2; ggpubr; ggsci; readxl; ggalluvial
+R packages: shiny 1.7.4 or higher; shinydashboard 0.7.2 or higher; threejs; DT; ggplot2; reshape2; ggpubr; ggsci; readxl; ggalluvial; golem
 
 ## webserver
 We prepared a freely-accessible webserver for helping users to use OpDEA without installation of the package, see http://www.ai4pro.tech:3838/OpDEA_test/.
