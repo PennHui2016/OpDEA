@@ -15,6 +15,8 @@ Then, the shiny app can be launched via:
     library(shinydashboard)
     OpDEA::run_app()
 
+If success, the page showing the introduction of our OpDEA will be presented. It can be used according to the contents in the help page.
+
 ## Requirements for installation of OpDEA
 please install the packages with the following version numbers or higher:
 
