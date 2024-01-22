@@ -17,10 +17,9 @@ It can be installed via two ways:
 
 Then, the package can be installed from github via the following code:
 
-    ```
     library(devtools)
     install_github('PennHui2016/OpDEA')
-    ```
+   
 
 2.Or via downloading **"OpDEA_0.0.0.9000.tar.gz"** from this site, then installed with the following command:
     
