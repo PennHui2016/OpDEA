@@ -10,8 +10,11 @@ It can be installed via two ways:
 1. Install the package "devtools" if you have not installed it before
 
     if(!requireNamespace("devtools")){
-      install.packages("devtools")
+   
+       install.packages("devtools")
+   
       library(devtools)
+   
     }
 
 Then, the package can be installed from github via the following code:
@@ -46,12 +49,15 @@ Running under: Windows 10 x64 (build 22631)
 Matrix products: default  
 
 attached base packages:
+
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
+
 [1] shinydashboard_0.7.2 shiny_1.8.0         
 
 loaded via a namespace (and not attached):
+
  [1] circlize_0.4.15     shape_1.4.6         tidyselect_1.2.0    bslib_0.6.1        
  [5] purrr_1.0.2         colorspace_2.1-0    vctrs_0.6.5         generics_0.1.3     
  [9] htmltools_0.5.7     yaml_2.3.8          base64enc_0.1-3     utf8_1.2.4         
