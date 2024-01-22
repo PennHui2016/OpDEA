@@ -14,7 +14,7 @@ It can be installed via two ways:
        install.packages("devtools")
        library(devtools)
     }
-```
+    ```
 
 Then, the package can be installed from github via the following code:
 
