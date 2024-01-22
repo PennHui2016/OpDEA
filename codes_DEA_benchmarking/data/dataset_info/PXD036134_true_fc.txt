@@ -1,0 +1,4 @@
+condition	YEAST
+B	12.5
+C	15.625
+D	18.75

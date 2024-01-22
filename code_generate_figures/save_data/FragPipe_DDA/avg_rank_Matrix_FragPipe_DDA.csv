@@ -1,0 +1,5 @@
+"pauc001feature","pauc001sr","pauc001rank","pauc005feature","pauc005sr","pauc005rank","pauc01feature","pauc01sr","pauc01rank","nMCCfeature","nMCCsr","nMCCrank","G-meanfeature","G-meansr","G-meanrank","avg_rank"
+"1","LFQ",1,1,"LFQ",0.666666666666667,2,"LFQ",0.333333333333333,3,"LFQ",0.666666666666667,2,"LFQ",0,4,2.4
+"2","dlfq",0.666666666666667,2,"dlfq",1,1,"dlfq",1,1,"dlfq",1,1,"dlfq",0.333333333333333,3,1.6
+"3","top0",0.333333333333333,3,"top0",0.333333333333333,3,"top0",0.666666666666667,2,"top0",0.333333333333333,3,"top0",1,1,2.4
+"4","top3",0,4,"top3",0,4,"top3",0,4,"top3",0,4,"top3",0.666666666666667,2,3.6

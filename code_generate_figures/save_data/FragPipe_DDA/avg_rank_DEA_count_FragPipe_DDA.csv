@@ -1,0 +1,4 @@
+"pauc001feature","pauc001sr","pauc001rank","pauc005feature","pauc005sr","pauc005rank","pauc01feature","pauc01sr","pauc01rank","nMCCfeature","nMCCsr","nMCCrank","G-meanfeature","G-meansr","G-meanrank","avg_rank"
+"1","plgem",1,1,"plgem",1,1,"plgem",1,1,"plgem",1,1,"plgem",1,1,1
+"2","edgeR",0.5,2,"edgeR",0.5,2,"edgeR",0.5,2,"edgeR",0.5,2,"edgeR",0.5,2,2
+"3","beta_binomial",0,3,"beta_binomial",0,3,"beta_binomial",0,3,"beta_binomial",0,3,"beta_binomial",0,3,3

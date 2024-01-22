@@ -1,0 +1,4 @@
+"mat1","mat2","abbr1","abbr2","mean","median","t_pval","significance","contrast"
+"1","beta_binomial","edgeR","A","B","-0.0206269387932344","0","2.9295446710265e-143","****","beta_binomial-edgeR"
+"2","beta_binomial","plgem","A","C","-0.0430853195182941","0","2.75915690811698e-169","****","beta_binomial-plgem"
+"3","edgeR","plgem","B","C","-0.0224583807250597","0","1.30826329448595e-42","****","edgeR-plgem"

@@ -1,0 +1,3 @@
+condition	YEAST	ECOLI
+A	30	5
+B	15	20

@@ -1,0 +1,9 @@
+condition	UPS
+A	0.1
+B	0.25
+C	1
+D	2.5
+E	5
+F	10
+G	25
+H	50

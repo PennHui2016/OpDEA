@@ -1,0 +1,7 @@
+0.2297979797979798,frozenset({'SAM'})
+0.11616161616161616,frozenset({'div.mean'})
+0.10858585858585859,frozenset({'div.median'})
+0.1414141414141414,frozenset({'MBQN'})
+0.16161616161616163,frozenset({'proDA'})
+0.18434343434343434,frozenset({'ttest'})
+0.26262626262626265,frozenset({'ANOVA'})

@@ -1,0 +1,3 @@
+#!D:\software\anaconda\envs\directlfq\python.exe
+from numba.pycc import main
+main()

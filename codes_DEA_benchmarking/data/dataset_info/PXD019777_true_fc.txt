@@ -1,0 +1,4 @@
+condition	ECOLI
+A	4.5
+B	6
+C	9

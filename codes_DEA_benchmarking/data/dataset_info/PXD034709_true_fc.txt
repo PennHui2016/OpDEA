@@ -1,0 +1,8 @@
+condition	MOUSE
+A	20
+B	5
+C	10
+D	13
+E	20
+F	30
+G	40
