@@ -1,4 +1,9 @@
 # OpDEA
+## webserver
+We prepared a freely-accessible webserver for helping users to use OpDEA without installation of the package, 
+see http://www.ai4pro.tech:3838/. The webserver requires uploading expression data, so we recommend using our
+standalone toolkit (with priority, no R package needs to be installed and no need to upload data,
+just decompress it and use it). If you hope to try our R package, please see following sections.
 
 ## Requirements for installation of OpDEA
 please install the packages with the following version numbers or higher:
@@ -75,12 +80,6 @@ At last, the shiny app can be launched via:
     OpDEA::run_app()
 
 If success, the page showing the introduction of our OpDEA will be presented. It can be used according to the contents in the help page.
-
-## webserver
-We prepared a freely-accessible webserver for helping users to use OpDEA without installation of the package, 
-see http://www.ai4pro.tech:3838/. The webserver requires uploading expression data, so we recommend using our
-standalone toolkit (with priority, no R package needs to be installed, just decompress it and use it),
-or this R package instead. 
 
 ## source codes for proteomics data differential expression analysis workflow benchmarking
 The python and R source codes for benchmarking proteomics data differential expression analysis workflows are located in the folder **"codes_DEA_benchmarking"**.
