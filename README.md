@@ -2,7 +2,7 @@
 ## webserver
 We prepared a freely-accessible webserver for helping users to use OpDEA without installation of the package, 
 see http://www.ai4pro.tech:3838/. The webserver requires uploading expression data, so we recommend using our
-standalone toolkit (with priority, no R package needs to be installed and no need to upload data,
+standalone toolkit (available at: https://zenodo.org/uploads/10548205, no R package needs to be installed and no need to upload data,
 just decompress it and use it). If you hope to try our R package, please see following sections.
 
 ## Requirements for installation of OpDEA
