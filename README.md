@@ -1,4 +1,9 @@
 # OpDEA
+OpDEA is a R shiny application for:
+1. presenting results of our benchmarking of proteomics data differential expression analysis workflow;
+2. guiding users to select optimal workflows for analyzing their proteomics data;
+3. providing links for downloading datasets used for benchmarking and for downloading our results.
+   
 ## webserver
 We prepared a freely-accessible webserver for helping users to use OpDEA without installation of the package, 
 see http://www.ai4pro.tech:3838/. The webserver requires uploading expression data, so we recommend using our
@@ -51,10 +56,6 @@ loaded via a namespace (and not attached):
 [61] R6_2.5.1            compiler_4.2.0 
 ```
 ## Installation
-OpDEA is a R shiny application for:
-1. presenting results of our benchmarking of proteomics data differential expression analysis workflow;
-2. guiding users to select optimal workflows for analyzing their proteomics data;
-3. providing links for downloading datasets used for benchmarking and for downloading our results.
 
 It can be installed via two ways:
 1. Install the package "devtools" if you have not installed it before
