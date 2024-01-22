@@ -1,36 +1,5 @@
 # OpDEA
 
-## Installation
-OpDEA is a R shiny application for:
-1. presenting results of our benchmarking of proteomics data differential expression analysis workflow;
-2. guiding users to select optimal workflows for analyzing their proteomics data;
-3. providing links for downloading datasets used for benchmarking and for downloading our results.
-
-It can be installed via two ways:
-1. Install the package "devtools" if you have not installed it before
-
-    ```
-    if(!requireNamespace("devtools")){
-       install.packages("devtools")
-    }
-    ```
-
-Then, the package can be installed from github via the following code:
-
-    library(devtools)
-    install_github('PennHui2016/OpDEA')
-   
-
-2.Or via downloading **"OpDEA_0.0.0.9000.tar.gz"** from this site, then installed with the following command:
-    
-    install.packages(pkgs = '~/OpDEA_0.0.0.9000.tar.gz', repos = NULL, type = "source")
-
-At last, the shiny app can be launched via:
-
-    OpDEA::run_app()
-
-If success, the page showing the introduction of our OpDEA will be presented. It can be used according to the contents in the help page.
-
 ## Requirements for installation of OpDEA
 please install the packages with the following version numbers or higher:
 
@@ -76,6 +45,36 @@ loaded via a namespace (and not attached):
 [57] ellipsis_0.3.2      rsconnect_1.2.0     attempt_0.3.1       rstudioapi_0.15.0  
 [61] R6_2.5.1            compiler_4.2.0 
 ```
+## Installation
+OpDEA is a R shiny application for:
+1. presenting results of our benchmarking of proteomics data differential expression analysis workflow;
+2. guiding users to select optimal workflows for analyzing their proteomics data;
+3. providing links for downloading datasets used for benchmarking and for downloading our results.
+
+It can be installed via two ways:
+1. Install the package "devtools" if you have not installed it before
+
+    ```
+    if(!requireNamespace("devtools")){
+       install.packages("devtools")
+    }
+    ```
+
+Then, the package can be installed from github via the following code:
+
+    library(devtools)
+    install_github('PennHui2016/OpDEA')
+   
+
+2.Or via downloading **"OpDEA_0.0.0.9000.tar.gz"** from this site, then installed with the following command:
+    
+    install.packages(pkgs = '~/OpDEA_0.0.0.9000.tar.gz', repos = NULL, type = "source")
+
+At last, the shiny app can be launched via:
+
+    OpDEA::run_app()
+
+If success, the page showing the introduction of our OpDEA will be presented. It can be used according to the contents in the help page.
 
 ## webserver
 We prepared a freely-accessible webserver for helping users to use OpDEA without installation of the package, 
