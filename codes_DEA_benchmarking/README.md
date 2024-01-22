@@ -1,3 +1,4 @@
+## Reproduce the workflow benchmarking
 The benchmarking codes are written with Python3, but the python codes will call R scripts to conduct differential expression analysis.
 
 Please follow the below procedures to reproduce the benchmarking results:
@@ -32,17 +33,23 @@ Please follow the below procedures to reproduce the benchmarking results:
    with FragPipe or Maxquant. R_fold specifies the path to your RScript.exe which should
    be the installation path of your R.
    
-   for DIA data: python DEA_benchmarking_NC_DIA.py platform R_fold
+   for DIA data:
+   ```
+   python DEA_benchmarking_NC_DIA.py platform R_fold
+   ```
    
    the parameter platform should be "DIANN" or "spt" where "DIANN" corresponds to
    proteomics data quantified by DIA-NN and "spt" means the proteomics data quantified 
    by Spectronaut.
    
-   for TMT data: python DEA_benchmarking_NC_TMT.py platform R_fold
+   for TMT data:
    
+   ```
+   python DEA_benchmarking_NC_TMT.py platform R_fold
+   ```  
    similarly, platform should be "FragPipe" or "Maxquant"
    
-5. The ensemble inference should be conducted after finishing above step 4 as we need 
+6. The ensemble inference should be conducted after finishing above step 4 as we need 
    to use the results from step3 to save time.
    
    firstly, the workflow benchmarking results should be cleared and formated to be acceptable
@@ -68,12 +75,16 @@ Please follow the below procedures to reproduce the benchmarking results:
 	"DEA_benchmarking_NC_TMT_ensemble.py" for TMT data
 	
 	commands:  
-	  
+
+	  ```
 	  python DEA_benchmarking_NC_DDA_ensemble.py platform ensemble_type Rscript_pth
-	  
+          ```
+	  ```
 	  python DEA_benchmarking_NC_DIA_ensemble.py platform ensemble_type Rscript_pth
-	  
+          ```
+	  ```
 	  python DEA_benchmarking_NC_TMT_ensemble.py platform ensemble_type Rscript_pth
+          ```
 	  
 	  similarly, for DDA and TMT data, the parameter "platform" should be 'FragPipe' or "Maxquant", DIA data should
 	  select "DIANN" or "spt";
