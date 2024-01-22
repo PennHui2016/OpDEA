@@ -9,13 +9,12 @@ OpDEA is a R shiny application for:
 It can be installed via two ways:
 1. Install the package "devtools" if you have not installed it before
 
+    ```
     if(!requireNamespace("devtools")){
-   
        install.packages("devtools")
-   
-      library(devtools)
-   
+       library(devtools)
     }
+```
 
 Then, the package can be installed from github via the following code:
 
