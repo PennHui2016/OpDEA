@@ -1,4 +1,3 @@
-#res_root<-'D:/data/benchmark/benchmark_res/'
 res_root<-'benchmark_res/'
 for (platform in c('spt')) { 
 
@@ -92,7 +91,7 @@ for (j in c(c(1:7))) {
 
 cls_metrics<-c('Acc', 'Prec', 'Rec', 'F1', 'F1w', 'Mcc', 'nMcc', 'geomean', 'tn', 'fp', 'fn', 'tp')
 cls_mt_all<-paste0(cls_metrics,'_all')
-uni_contr<-unique(strsplit(gsub('condition', '',contrs), ';',fixed = T)[[1]])
+uni_contr<-sort(unique(strsplit(gsub('condition', '',contrs), ';',fixed = T)[[1]]))
 for (contr in uni_contr) {
   cls_mt_all<-c(cls_mt_all, paste0(cls_metrics, '_',contr))
 }

@@ -17,62 +17,62 @@ plot_ens<-function(i, metric, st, en, wb){
   platforms<-c('FragPipe', 'Maxquant', 'Maxquant', 'FragPipe','DIANN', 'spt')
   acqs<-c('DDA', 'DDA','TMT', 'TMT', 'DIA', 'DIA')
   settings<-c('FG_DDA','MQ_DDA','MQ_TMT','FG_TMT','DIANN_DIA','spt_DIA')
-
+  
   platform = platforms[i]
   setting = settings[i]
   acq = acqs[i]
-
+  
   values=read_excel(paste0(data_fold, 'metrics_', platform, '_',acq,'.xlsx'), sheet = metric)
   ranks_all = read_excel(paste0(data_fold, 'ranks_all_', platform, '_', acq,'.xlsx'), sheet = 'ranking_all')
-
+  
   if (setting!='MQ_TMT'){
     values_ens_mv = read_excel(paste0(data_fold, 'metrics_', platform, '_',acq,'_all_ensemble_mv.xlsx'), sheet = metric)
     ranks_ens_mv = read_excel(paste0(data_fold, 'ranks_all_', platform, '_', acq,'_ensemble_mv.xlsx'), sheet = 'ranking_all')
     T1_mv=ranks_ens_mv$workflow[which(ranks_ens_mv$avg_rank_mean==min(ranks_ens_mv$avg_rank_mean))]
-
+    
     if(length(T1_mv)>1){
       T1_mv=T1_mv[1]
     }
   }
   values_ens_topk = read_excel(paste0(data_fold, 'metrics_', platform, '_',acq,'_all_ensemble_topk.xlsx'), sheet = metric)
-
+  
   ranks_ens_topk = read_excel(paste0(data_fold, 'ranks_all_', platform, '_', acq,'_ensemble_topk.xlsx'), sheet = 'ranking_all')
-
+  
   T1_wf=ranks_all$workflow[which(ranks_all$avg_rank_mean==min(ranks_all$avg_rank_mean))]
   if(length(T1_wf)>1){
     T1_wf=T1_wf[1]
   }
-
+  
   T1_topk=ranks_ens_topk$workflow[which(ranks_ens_topk$avg_rank_mean==min(ranks_ens_topk$avg_rank_mean))]
   if(length(T1_topk)>1){
     T1_topk=T1_topk[1]
   }
   T1_wf<-gsub('\\|\\|',paste0('\\|',platform,'\\|'),T1_wf)
-
+  
   comb_all<-cbind(as.numeric(values[which(values$workflow==T1_wf),][st:en]), rep(metric, en-st+1),
                   rep('TOP1',en-st+1))
-
+  
   if (setting!='MQ_TMT'){
     comb_all<-rbind(comb_all,cbind(
       as.numeric(values_ens_mv[which(values_ens_mv$workflow==T1_mv),(st+1):(en+1)]), rep(metric, en-st+1),
       rep('ens_multi-quant',en-st+1)
     ))}
-
+  
   comb_all<-rbind(comb_all,cbind(
     as.numeric(values_ens_topk[which(values_ens_topk$workflow==T1_topk),(st+1):(en+1)]), rep(metric, en-st+1),
     rep('ens_topk',en-st+1)
   ))
-
-
+  
+  
   comb_all<-as.data.frame(comb_all)
   colnames(comb_all)<-c('value','metric','method')
-
+  
   my_comparisons=list(c('TOP1','ens_multi-quant'),
                       c('TOP1','ens_topk'),
                       c('ens_multi-quant', 'ens_topk'))
   melted_data <- comb_all
   melted_data$value<-as.numeric(melted_data$value)
-
+  
   cols=c("#1f78b4","#b2df8a","#fb9a99","#fdbf6f","#e31a1c","#a6cee3","#33a02c")
   if(metric=='pAUC0.01' | metric=='pAUC0.05' | metric=='pAUC0.1'){
     ylab='pAUC(0.01)'
@@ -83,31 +83,29 @@ plot_ens<-function(i, metric, st, en, wb){
     ymin=0
     ymax=1
   }
-
+  
   if(setting!='MQ_TMT'){
     col=cols[c(1:3)]
   }else{
     col=cols[c(1,3)]
   }
-
+  
   p1<-ggboxplot(melted_data, "method", "value",width = 0.7, size=0.8,
                 color="method", palette = col, title = setting,
                 add = "jitter")+
     labs(x = '', y = ylab)+scale_x_discrete(limits=unique(melted_data$method))+
     scale_y_continuous(limits = c(ymin, ymax))+
     theme_classic() +
-    #theme(axis.text.x = element_text(size = 10), axis.text.x=element_blank(),axis.text.y = element_text(size = 10))+
     theme(axis.title.y= element_text(size=15))+theme(axis.title.x = element_text(size = 15), axis.text.y = element_text(size = 15))+
     theme(legend.title=element_text(size=14),legend.text=element_text(size=14))+
-    #stat_compare_means(method="t.test",hide.ns = F,comparisons = my_comparisons,label="p.signif")+
     theme(legend.position = "right")+stat_summary(fun=mean,
                                                   geom="point",
                                                   shape=17, size=3, color="red", fill="red")+
     theme(plot.title = element_text(size = 16,hjust = 0.5, face = "bold"))+theme(axis.text.x=element_blank())
-
+  
   p1
   sheet=paste0(setting,'_', metric)
-
+  
   addWorksheet(wb,sheet)
   writeData(wb, sheet, melted_data, startRow = 1, startCol = 1, colNames = TRUE, rowNames = TRUE)
   saveWorkbook(wb, file = paste0(save_fold, 'metrics_top_ens.xlsx'), overwrite = TRUE)
@@ -115,42 +113,42 @@ plot_ens<-function(i, metric, st, en, wb){
 }
 
 library(openxlsx)
-wb <- createWorkbook()
+wb7 <- createWorkbook()
 
-p1<-plot_ens(1, 'pAUC0.01', 7, 28, wb)
-p2<-plot_ens(2, 'pAUC0.01', 7, 28, wb)
-p3<-plot_ens(3, 'pAUC0.01', 7, 21, wb)
-p4<-plot_ens(4, 'pAUC0.01', 7, 21, wb)
-p5<-plot_ens(5, 'pAUC0.01', 7, 23, wb)
-p6<-plot_ens(6, 'pAUC0.01', 7, 23, wb)
+p1<-plot_ens(1, 'pAUC0.01', 7, 28, wb7)
+p2<-plot_ens(2, 'pAUC0.01', 7, 28, wb7)
+p3<-plot_ens(3, 'pAUC0.01', 7, 21, wb7)
+p4<-plot_ens(4, 'pAUC0.01', 7, 21, wb7)
+p5<-plot_ens(5, 'pAUC0.01', 7, 23, wb7)
+p6<-plot_ens(6, 'pAUC0.01', 7, 23, wb7)
 
-p11<-plot_ens(1, 'G-mean0.05', 7, 28, wb)
-p21<-plot_ens(2, 'G-mean0.05', 7, 28, wb)
-p31<-plot_ens(3, 'G-mean0.05', 7, 21, wb)
-p41<-plot_ens(4, 'G-mean0.05', 7, 21, wb)
-p51<-plot_ens(5, 'G-mean0.05', 7, 23, wb)
-p61<-plot_ens(6, 'G-mean0.05', 7, 23, wb)
+p11<-plot_ens(1, 'G-mean0.05', 7, 28, wb7)
+p21<-plot_ens(2, 'G-mean0.05', 7, 28, wb7)
+p31<-plot_ens(3, 'G-mean0.05', 7, 21, wb7)
+p41<-plot_ens(4, 'G-mean0.05', 7, 21, wb7)
+p51<-plot_ens(5, 'G-mean0.05', 7, 23, wb7)
+p61<-plot_ens(6, 'G-mean0.05', 7, 23, wb7)
 
-p12<-plot_ens(1, 'pAUC0.05', 7, 28, wb)
-p22<-plot_ens(2, 'pAUC0.05', 7, 28, wb)
-p32<-plot_ens(3, 'pAUC0.05', 7, 21, wb)
-p42<-plot_ens(4, 'pAUC0.05', 7, 21, wb)
-p52<-plot_ens(5, 'pAUC0.05', 7, 23, wb)
-p62<-plot_ens(6, 'pAUC0.05', 7, 23, wb)
+p12<-plot_ens(1, 'pAUC0.05', 7, 28, wb7)
+p22<-plot_ens(2, 'pAUC0.05', 7, 28, wb7)
+p32<-plot_ens(3, 'pAUC0.05', 7, 21, wb7)
+p42<-plot_ens(4, 'pAUC0.05', 7, 21, wb7)
+p52<-plot_ens(5, 'pAUC0.05', 7, 23, wb7)
+p62<-plot_ens(6, 'pAUC0.05', 7, 23, wb7)
 
-p13<-plot_ens(1, 'pAUC0.1', 7, 28, wb)
-p23<-plot_ens(2, 'pAUC0.1', 7, 28, wb)
-p33<-plot_ens(3, 'pAUC0.1', 7, 21, wb)
-p43<-plot_ens(4, 'pAUC0.1', 7, 21, wb)
-p53<-plot_ens(5, 'pAUC0.1', 7, 23, wb)
-p63<-plot_ens(6, 'pAUC0.1', 7, 23, wb)
+p13<-plot_ens(1, 'pAUC0.1', 7, 28, wb7)
+p23<-plot_ens(2, 'pAUC0.1', 7, 28, wb7)
+p33<-plot_ens(3, 'pAUC0.1', 7, 21, wb7)
+p43<-plot_ens(4, 'pAUC0.1', 7, 21, wb7)
+p53<-plot_ens(5, 'pAUC0.1', 7, 23, wb7)
+p63<-plot_ens(6, 'pAUC0.1', 7, 23, wb7)
 
-p14<-plot_ens(1, 'nMCC0.05', 7, 28, wb)
-p24<-plot_ens(2, 'nMCC0.05', 7, 28, wb)
-p34<-plot_ens(3, 'nMCC0.05', 7, 21, wb)
-p44<-plot_ens(4, 'nMCC0.05', 7, 21, wb)
-p54<-plot_ens(5, 'nMCC0.05', 7, 23, wb)
-p64<-plot_ens(6, 'nMCC0.05', 7, 23, wb)
+p14<-plot_ens(1, 'nMCC0.05', 7, 28, wb7)
+p24<-plot_ens(2, 'nMCC0.05', 7, 28, wb7)
+p34<-plot_ens(3, 'nMCC0.05', 7, 21, wb7)
+p44<-plot_ens(4, 'nMCC0.05', 7, 21, wb7)
+p54<-plot_ens(5, 'nMCC0.05', 7, 23, wb7)
+p64<-plot_ens(6, 'nMCC0.05', 7, 23, wb7)
 
 extract_legend <- function(my_ggp) {
   step1 <- ggplot_gtable(ggplot_build(my_ggp))
@@ -160,8 +158,6 @@ extract_legend <- function(my_ggp) {
 }
 
 shared_legend <- extract_legend(p1$p1)
-
-## Figure 5A
 
 library(ggpubr)
 library("gridExtra")
@@ -200,7 +196,7 @@ write.table(p61$dt, paste0(save_fold, 'Figure5A_12.csv'), col.names = T, row.nam
 #######################
 ## cross_setting compare
 library(openxlsx)
-wb <- createWorkbook()
+wb8 <- createWorkbook()
 
 data_fold<-paste0(dirname(rstudioapi::getSourceEditorContext()$path),'/data/')
 save_fold<-paste0(dirname(rstudioapi::getSourceEditorContext()$path),'/save_data/')
@@ -209,13 +205,18 @@ top1wf<-function(dt, platform, acq){
   base_fold<-data_fold
   dea_res_fold<-paste0(base_fold, acq, '/',platform, '/',dt,'/')
   ranking_all_FG_DDA<-read_excel(paste0(data_fold, 'ranks_all_', platform, '_', acq, '.xlsx'), sheet = 'ranking_all')
-
-  #ranking_all<-ranking_all[which(ranking_all$runTime!=0 & ranking_all$mean_pauc001!=0 & ranking_all$rank_median_pauc001!=0),]
+  
+  
   wftop1_FG_DDA<-ranking_all_FG_DDA[which(ranking_all_FG_DDA$avg_rank_mean==min(ranking_all_FG_DDA$avg_rank_mean)),]
   if(length((wftop1_FG_DDA$workflow))>1){
     idx=which(wftop1_FG_DDA$avg_rank_median==min(wftop1_FG_DDA$avg_rank_median))
     wftop1_FG_DDA = wftop1_FG_DDA[idx,]
   }
+  print(paste0(dea_res_fold,
+               dt,'_',wftop1_FG_DDA$DEA,'_',
+               wftop1_FG_DDA$Platform,'_',
+               wftop1_FG_DDA$Matrix,'_',gsub('blank','',wftop1_FG_DDA$Imput),
+               '_',gsub('blank','',wftop1_FG_DDA$normalization),'.csv'))
   dea_res_FG_DDA_wf1<-read.table(paste0(dea_res_fold,
                                         dt,'_',wftop1_FG_DDA$DEA,'_',
                                         wftop1_FG_DDA$Platform,'_',
@@ -232,9 +233,9 @@ top1wf_ens<-function(dt, platform, acq, ens_ty){
   }else if(ens_ty=='ensemble_topk'){
     dea_res_fold<-paste0(base_fold, acq, '/',platform, '/','topk','/',dt,'/')
   }
-  #dea_res_fold<-paste0(base_fold, acq, '/',platform, '/',dt,'/')
+  
   ranking_all_FG_DDA<-read_excel(paste0(data_fold, 'ranks_all_', platform, '_', acq, '_', ens_ty, '.xlsx'), sheet = 'ranking_all')
-  #ranking_all<-ranking_all[which(ranking_all$runTime!=0 & ranking_all$mean_pauc001!=0 & ranking_all$rank_median_pauc001!=0),]
+  
   wftop1_FG_DDA<-ranking_all_FG_DDA[which(ranking_all_FG_DDA$avg_rank_mean==min(ranking_all_FG_DDA$avg_rank_mean)),]
   if(length((wftop1_FG_DDA$workflow))>1){
     idx=which(wftop1_FG_DDA$avg_rank_median==min(wftop1_FG_DDA$avg_rank_median))
@@ -255,9 +256,10 @@ top1wf_ens<-function(dt, platform, acq, ens_ty){
                                           wftop1_FG_DDA$method,'_',gsub('\\|','-',wftop1_FG_DDA$cbn),'.csv'),
                                    sep = ',',header = T)
   }
-
+  
   return(list(wf=wftop1_FG_DDA, dea_res=dea_res_FG_DDA_wf1))
 }
+
 
 dt='HYEtims735'
 
@@ -276,23 +278,14 @@ top1_DIANN_DIA_ens=top1wf_ens('HYEtims735_DIA', 'DIANN', 'DIA', 'ensemble_mv')
 top1_spt_DIA_ens=top1wf_ens('HYEtims735_DIA', 'spt', 'DIA', 'ensemble_mv')
 
 
-
-# dt='HEqe408'
-#
-# all_protein_FG_DDA<-read.table('D:/data/benchmark/data/DDA/FragPipe/HEqe408_LFQ_FragPipe_all_proteins.tsv', sep = '\t', header = T)
-# all_protein_MQ_DDA<-read.table('D:/data/benchmark/data/DDA/Maxquant/HEqe408_LFQ_Maxquant_all_proteins.tsv', sep = '\t', header = T)
-# all_protein_DIANN_DIA<-read.table('D:/data/benchmark/data/DIA/DIANN/HEqe408_DIA_DIANN_all_proteins.tsv', sep = '\t', header = T)
-# all_protein_spt_DIA<-read.table('D:/data/benchmark/data/DIA/Spectronaut/HEqe408_DIA_spt_all_proteins.tsv', sep = '\t', header = T)
-#
-# top1_FG_DDA<-top1wf('HEqe408_LFQ', 'FragPipe', 'DDA')
-# top1_MQ_DDA<-top1wf('HEqe408_LFQ', 'Maxquant', 'DDA')
-# top1_DIANN_DIA<-top1wf('HEqe408_DIA', 'DIANN', 'DIA')
-# top1_spt_DIA<-top1wf('HEqe408_DIA', 'spt', 'DIA')
-# top1_FG_DDA_ens=top1wf_ens('HEqe408_LFQ', 'FragPipe', 'DDA', 'ensemble_mv')
-# top1_MQ_DDA_ens=top1wf_ens('HEqe408_LFQ', 'Maxquant', 'DDA', 'ensemble_mv')
-# top1_DIANN_DIA_ens=top1wf_ens('HEqe408_DIA', 'DIANN', 'DIA', 'ensemble_mv')
-# top1_spt_DIA_ens=top1wf_ens('HEqe408_DIA', 'spt', 'DIA', 'ensemble_mv')
-
+top1_FG_DDA<-top1wf('HYEtims735_LFQ', 'FragPipe', 'DDA')
+top1_MQ_DDA<-top1wf('HYEtims735_LFQ', 'Maxquant', 'DDA')
+top1_DIANN_DIA<-top1wf('HYEtims735_DIA', 'DIANN', 'DIA')
+top1_spt_DIA<-top1wf('HYEtims735_DIA', 'spt', 'DIA')
+top1_FG_DDA_ens=top1wf_ens('HYEtims735_LFQ', 'FragPipe', 'DDA', 'ensemble_mv')
+top1_MQ_DDA_ens=top1wf_ens('HYEtims735_LFQ', 'Maxquant', 'DDA', 'ensemble_mv')
+top1_DIANN_DIA_ens=top1wf_ens('HYEtims735_DIA', 'DIANN', 'DIA', 'ensemble_mv')
+top1_spt_DIA_ens=top1wf_ens('HYEtims735_DIA', 'spt', 'DIA', 'ensemble_mv')
 
 
 FG_DDA<-top1_FG_DDA$dea_res$protein[which(abs(top1_FG_DDA$dea_res$logFC)>=log2(1.5) & top1_FG_DDA$dea_res$adj.pvalue<=0.05)]
@@ -305,6 +298,9 @@ MQ_DDA_ens<-top1_MQ_DDA_ens$dea_res$protein[which(abs(top1_MQ_DDA_ens$dea_res$lo
 DIANN_DIA_ens<-top1_DIANN_DIA_ens$dea_res$protein[which(abs(top1_DIANN_DIA_ens$dea_res$logFC)>=log2(1.5) & top1_DIANN_DIA_ens$dea_res$adj.pvalue<=0.05)]
 spt_DIA_ens<-top1_spt_DIA_ens$dea_res$protein[which(abs(top1_spt_DIA_ens$dea_res$logFC)>=log2(1.5) & top1_spt_DIA_ens$dea_res$adj.pvalue<=0.05)]
 
+pool_FG_MQ_DDA<-unique(c(FG_DDA, MQ_DDA))
+pool_DIANN_spt_DIA<-unique(c(DIANN_DIA, spt_DIA))
+pool_DDA_DIA<-unique(c(pool_FG_MQ_DDA, pool_DIANN_spt_DIA))
 
 T_YEAST<-unique(union(union(union(all_protein_FG_DDA$Protein[which(all_protein_FG_DDA$Organism=='YEAST')],
                                   all_protein_MQ_DDA$Protein[which(all_protein_MQ_DDA$Organism=='YEAST')]),
@@ -356,8 +352,7 @@ DEPs$T_YEAST=c(rep(0, length(DEPs$Proteins)))
 DEPs$T_YEAST[match(T_YEAST, DEPs$Proteins)]=1
 DEPs$T_ECOLI=c(rep(0, length(DEPs$Proteins)))
 DEPs$T_ECOLI[match(T_ECOLI, DEPs$Proteins)]=1
-# DEPs$T_HUMAN=c(rep(0, length(DEPs$Proteins)))
-# DEPs$T_HUMAN[match(T_HUMAN, DEPs$Proteins)]=1
+
 DEPs$DEP_HUMAN=c(rep(0, length(DEPs$Proteins)))
 DEPs$DEP_HUMAN[match(DEP_HUMAN, DEPs$Proteins)]=1
 DEPs$FG_DDA=c(rep(0, length(DEPs$Proteins)))
@@ -378,14 +373,21 @@ DEPs$DIANN_DIA_ens[match(DIANN_DIA_ens, DEPs$Proteins)]=1
 DEPs$spt_DIA_ens=c(rep(0, length(DEPs$Proteins)))
 DEPs$spt_DIA_ens[match(spt_DIA_ens, DEPs$Proteins)]=1
 
+DEPs$pool_DDA=c(rep(0, length(DEPs$Proteins)))
+DEPs$pool_DDA[match(pool_FG_MQ_DDA, DEPs$Proteins)]=1
+DEPs$pool_DIA=c(rep(0, length(DEPs$Proteins)))
+DEPs$pool_DIA[match(pool_DIANN_spt_DIA, DEPs$Proteins)]=1
+DEPs$pool_DDA_DIA=c(rep(0, length(DEPs$Proteins)))
+DEPs$pool_DDA_DIA[match(pool_DDA_DIA, DEPs$Proteins)]=1
 # simply remove protein groups
 DEPs<-DEPs[setdiff(c(1:length(DEPs$Proteins)),grep(';', DEPs$Proteins)),]
 
 sheet=paste(dt, '_cp_DEPs')
 
-addWorksheet(wb,sheet)
-writeData(wb, sheet, DEPs, startRow = 1, startCol = 1, colNames = TRUE, rowNames = TRUE)
-saveWorkbook(wb, file = paste0(save_fold, 'cross_platform_compare.xlsx'), overwrite = TRUE)
+addWorksheet(wb8,sheet)
+writeData(wb8, sheet, DEPs, startRow = 1, startCol = 1, colNames = TRUE, rowNames = TRUE)
+
+#saveWorkbook(wb, file = paste0(save_fold, 'cross_platform_compare.xlsx'), overwrite = TRUE)
 
 library(UpSetR)
 library(UpSetR)
@@ -559,29 +561,9 @@ UpSetR::upset(DEPs,
               sets.bar.color=c("#15d08a","#f2ca01","#a45ee3","#1f11b4","#c3642c",
                                "#f078b4", '#5494cc',"gray","pink",'red','orange'),mb.ratio=c(0.5, 0.5), text.scale = 1.5,
               number.angles =0)
-#,mainbar.y.max =900
-# if (!require(devtools)) install.packages("devtools")
-# devtools::install_github("yanlinlin82/ggvenn")
-# library(ComplexHeatmap)
-# lists<-list(T_YEAST=DEPs$Proteins[which(DEPs$T_YEAST==1)],
-#             T_ECOLI=DEPs$Proteins[which(DEPs$T_ECOLI==1)],
-#             DEP_HUMAN=DEPs$Proteins[which(DEPs$DEP_HUMAN==1)],
-#             FG_DDA=DEPs$Proteins[which(DEPs$FG_DDA==1)],
-#             MQ_DDA=DEPs$Proteins[which(DEPs$MQ_DDA==1)],
-#             DIANN_DIA=DEPs$Proteins[which(DEPs$DIANN_DIA==1)],
-#             spt_DIA=DEPs$Proteins[which(DEPs$spt_DIA==1)],
-#             FG_DDA_ens=DEPs$Proteins[which(DEPs$FG_DDA_ens==1)],
-#             MQ_DDA_ens=DEPs$Proteins[which(DEPs$MQ_DDA_ens==1)],
-#             DIANN_DIA_ens=DEPs$Proteins[which(DEPs$DIANN_DIA_ens==1)],
-#             spt_DIA_ens=DEPs$Proteins[which(DEPs$spt_DIA_ens==1)])
-#
-# m = make_comb_mat(lists, mode = "distinct")
-# UpSet(m)
 
 library(pROC)
 library(ggpubr)
-
-#all_pvals<-read.table('E:/proteomics/manu4_1/codes/reproduce_0_05/temp0_limma_min_FragPipe/HYEtims735_LFQ_top0_maxlfq_mv_outputs.csv',header = T, sep = ',')
 
 cross_platform_proteins<-data.frame(Proteins=DEPs$Proteins, labels=0)
 cross_platform_proteins$labels[grep('YEAST', cross_platform_proteins$Proteins)]=1
@@ -650,11 +632,31 @@ idx2=match(com, top1_spt_DIA_ens$dea_res$protein)
 cross_platform_proteins$qval_spt_DIA_ens[idx1]=top1_spt_DIA_ens$dea_res$adj.pvalue[idx2]
 cross_platform_proteins$logFC_spt_DIA_ens[idx1]=top1_spt_DIA_ens$dea_res$logFC[idx2]
 
+cross_platform_proteins$qval_pool_DDA<-apply(cbind(cross_platform_proteins$qval_FG_DDA,
+                                                   cross_platform_proteins$qval_MQ_DDA),
+                                             1, function(x) min(x))
+cross_platform_proteins$logFC_pool_DDA<-unlist(apply(cbind(cross_platform_proteins$logFC_FG_DDA,
+                                                           cross_platform_proteins$logFC_MQ_DDA),
+                                                     1, function(x) x[which(abs(x)==max(abs(x)))[1]]))
+
+cross_platform_proteins$qval_pool_DIA<-apply(cbind(cross_platform_proteins$qval_DIANN_DIA,
+                                                   cross_platform_proteins$qval_spt_DIA),
+                                             1, function(x) min(x))
+cross_platform_proteins$logFC_pool_DIA<-unlist(apply(cbind(cross_platform_proteins$logFC_DIANN_DIA,
+                                                           cross_platform_proteins$logFC_spt_DIA),
+                                                     1, function(x) x[which(abs(x)==max(abs(x)))[1]]))
+
+cross_platform_proteins$qval_pool_DDA_DIA<-apply(cbind(cross_platform_proteins$qval_pool_DDA,
+                                                       cross_platform_proteins$qval_pool_DIA),
+                                                 1, function(x) min(x))
+cross_platform_proteins$logFC_pool_DDA_DIA<-unlist(apply(cbind(cross_platform_proteins$logFC_pool_DDA,
+                                                               cross_platform_proteins$logFC_pool_DIA),
+                                                         1, function(x) x[which(abs(x)==max(abs(x)))[1]]))
 sheet=paste(dt, '_cp_proteins')
 
-addWorksheet(wb,sheet)
-writeData(wb, sheet, cross_platform_proteins, startRow = 1, startCol = 1, colNames = TRUE, rowNames = TRUE)
-saveWorkbook(wb, file = paste0(save_fold, 'cross_platform_compare.xlsx'), overwrite = TRUE)
+addWorksheet(wb8,sheet)
+writeData(wb8, sheet, cross_platform_proteins, startRow = 1, startCol = 1, colNames = TRUE, rowNames = TRUE)
+#saveWorkbook(wb8, file = paste0(save_fold, 'cross_platform_compare.xlsx'), overwrite = TRUE)
 
 roc_FG_DDA <- roc(cross_platform_proteins$labels, 1-cross_platform_proteins$qval_FG_DDA)
 roc_MQ_DDA <- roc(cross_platform_proteins$labels, 1-cross_platform_proteins$qval_MQ_DDA)
@@ -666,21 +668,10 @@ roc_MQ_DDA_ens <- roc(cross_platform_proteins$labels, 1-cross_platform_proteins$
 roc_DIANN_DIA_ens <- roc(cross_platform_proteins$labels, 1-cross_platform_proteins$qval_DIANN_DIA_ens)
 roc_spt_DIA_ens <- roc(cross_platform_proteins$labels, 1-cross_platform_proteins$qval_spt_DIA_ens)
 
-# ms_bench_auc <- function(FPR, TPR, fpr_threshold = 1) {
-#   # make sure that sorted.
-#   oFPR <- order(FPR)
-#   FPR <- FPR[oFPR]
-#   TPR <- TPR[oFPR]
-#
-#   idx <- FPR < fpr_threshold
-#   TPR <- TPR[idx]
-#   FPR <- FPR[idx]
-#   #integrate
-#   res <- 1 / 2 * sum(diff(FPR) * (head(TPR,-1) + tail(TPR,-1)))
-#   return(res / fpr_threshold * 100)
-# }
-# ms_bench_auc(1-roc_FG_DDA$specificities,roc_FG_DDA$sensitivities, fpr_threshold = 0.01)
-# auc(roc_FG_DDA, partial.auc=c(1, 0.99), partial.auc.correct=TRUE)
+roc_pool_DDA<-roc(cross_platform_proteins$labels, 1-cross_platform_proteins$qval_pool_DDA)
+roc_pool_DIA<-roc(cross_platform_proteins$labels, 1-cross_platform_proteins$qval_pool_DIA)
+roc_pool_DDA_DIA<-roc(cross_platform_proteins$labels, 1-cross_platform_proteins$qval_pool_DDA_DIA)
+
 spe_sens<-rbind(cbind(roc_FG_DDA$specificities, roc_FG_DDA$sensitivities,
                       c(rep(paste0('FG_DDA(',as.character(round(auc(roc_FG_DDA,
                                                                     partial.auc=c(1, 0.95),
@@ -727,12 +718,12 @@ colnames(spe_sens)<-c('Specificity', 'Sensitivity', 'Method(pAUC(FPR=0.05))')
 spe_sens<-as.data.frame(spe_sens)
 spe_sens$Specificity<-1-as.numeric(spe_sens$Specificity)
 spe_sens$Sensitivity<-as.numeric(spe_sens$Sensitivity)
-#roc.test(roc_v1, roc_v2)
+
 breaks = seq(0,1,0.1)
 ggplot(spe_sens, aes(x = Specificity, y = Sensitivity, colour = `Method(pAUC(FPR=0.05))`))+
   scale_color_manual(values=c("#15d08a","#f2ca01","#a45ee3","#1f11b4","#c3642c",
                               "#f078b4", '#5494cc',"gray","pink",'red','orange')) +
-  #geom_segment(aes(x = 0, y = 1, xend = 1,yend = 0),linewidth=10, alpha = 0.5, colour = "gray") +
+  
   geom_step(linewidth=1,alpha = 0.9) +
   scale_x_continuous(name = "False Positive Rate (1 - Specificity)",limits = c(0,0.1), breaks = breaks) +
   scale_y_continuous(name = "True Positive Rate (Sensitivity)", limits = c(0,0.7), breaks = breaks) +
@@ -742,9 +733,7 @@ ggplot(spe_sens, aes(x = Specificity, y = Sensitivity, colour = `Method(pAUC(FPR
     x = "False Positive Rate (1-Specificity)",
     y = "True Positive Rate (Sensitivity)")+ theme(legend.position = c(0.7, 0.35)) +
   geom_vline(xintercept = 0.05,linetype="dashed")
-#annotate("text", x = 0.1, y = 0.1, vjust = 0, label = paste("pAUC(0.05) =",sprintf("%.3f",aucAvg))) +
-#guides(colour = guide_legend(legendTitel)) +
-#theme(axis.ticks = element_line(color = "grey80"))
+
 
 cross_platform_metrics<-function(cross_platform_proteins, setting, roc){
   lab=cross_platform_proteins$labels
@@ -780,12 +769,24 @@ cross_platform_metrics<-function(cross_platform_proteins, setting, roc){
     logFCs=cross_platform_proteins$logFC_spt_DIA_ens
     qvals=cross_platform_proteins$qval_spt_DIA_ens
     roc_s<-roc_spt_DIA_ens
+  }else if(setting == 'pool_DDA'){
+    logFCs=cross_platform_proteins$logFC_pool_DDA
+    qvals=cross_platform_proteins$qval_pool_DDA
+    roc_s<-roc_pool_DDA
+  }else if(setting == 'pool_DIA'){
+    logFCs=cross_platform_proteins$logFC_pool_DIA
+    qvals=cross_platform_proteins$qval_pool_DIA
+    roc_s<-roc_pool_DIA
+  }else if(setting == 'pool_DDA_DIA'){
+    logFCs=cross_platform_proteins$logFC_pool_DDA_DIA
+    qvals=cross_platform_proteins$qval_pool_DDA_DIA
+    roc_s<-roc_pool_DDA_DIA
   }
   TP=length(which(lab==1 & abs(logFCs)>=log2(1.5) & qvals<=0.05))
   TN=length(which(lab==0 & (abs(logFCs)<=log2(1.5) | qvals>0.05)))
   FP=length(which(lab==0 & abs(logFCs)>=log2(1.5) & qvals<=0.05))
   FN=length(which(lab==1 & (abs(logFCs)<=log2(1.5) | qvals>0.05)))
-
+  
   Recall = TP/(TP+FN)
   Precision = TP/(TP+FP)
   Specificity = TN/(TN+FP)
@@ -793,7 +794,7 @@ cross_platform_metrics<-function(cross_platform_proteins, setting, roc){
   MCC = (TP*TN-FP*FN)/(((TP+FP)^0.5)*((TP+FN)^0.5)*((TN+FP)^0.5)*((TN+FN))^0.5)
   nMCC = (1+MCC)/2
   Gmean = (Recall*Specificity)^0.5
-
+  
   pauc001=as.numeric(auc(roc_s, partial.auc=c(1, 0.99), partial.auc.correct=TRUE))
   pauc005=as.numeric(auc(roc_s, partial.auc=c(1, 0.95), partial.auc.correct=TRUE))
   pauc01=as.numeric(auc(roc_s, partial.auc=c(1, 0.90), partial.auc.correct=TRUE))
@@ -812,52 +813,48 @@ metrics_MQ_DDA_ens=cross_platform_metrics(cross_platform_proteins, 'MQ_DDA_ens',
 metrics_DIANN_DIA_ens=cross_platform_metrics(cross_platform_proteins, 'DIANN_DIA_ens', roc_DIANN_DIA_ens)
 metrics_spt_DIA_ens=cross_platform_metrics(cross_platform_proteins, 'spt_DIA_ens', roc_spt_DIA_ens)
 
+metrics_pool_DDA=cross_platform_metrics(cross_platform_proteins, 'pool_DDA', roc_pool_DDA)
+metrics_pool_DIA=cross_platform_metrics(cross_platform_proteins, 'pool_DIA', roc_pool_DIA)
+metrics_pool_DDA_DIA=cross_platform_metrics(cross_platform_proteins, 'pool_DDA_DIA', roc_pool_DDA_DIA)
+
 rdar_dt<-rbind(metrics_FG_DDA$value, metrics_MQ_DDA$value, metrics_DIANN_DIA$value, metrics_spt_DIA$value,
-               metrics_FG_DDA_ens$value, metrics_MQ_DDA_ens$value, metrics_DIANN_DIA_ens$value, metrics_spt_DIA_ens$value)
+               metrics_FG_DDA_ens$value, metrics_MQ_DDA_ens$value, 
+               metrics_DIANN_DIA_ens$value, metrics_spt_DIA_ens$value)#,
+#metrics_pool_DDA$value, metrics_pool_DIA$value, metrics_pool_DDA_DIA$value)
 colnames(rdar_dt)<-metrics_FG_DDA$metric
-row.names(rdar_dt)<-c('FG_DDA','MQ_DDA', 'DIANN_DIA', 'spt_DIA', 'FG_DDA_ens','MQ_DDA_ens', 'DIANN_DIA_ens', 'spt_DIA_ens')
+row.names(rdar_dt)<-c('FG_DDA','MQ_DDA', 'DIANN_DIA', 'spt_DIA', 'FG_DDA_ens',
+                      'MQ_DDA_ens', 'DIANN_DIA_ens', 'spt_DIA_ens')#,
+#'pool_DDA','pool_DIA', 'pool_DDA_DIA')
 rdar_dt<-as.data.frame(as.matrix(rdar_dt))
 pt_rdar_dt<-data.frame(group=row.names(rdar_dt))
 
 sheet=paste(dt, '_cp_metrics')
 
-addWorksheet(wb,sheet)
-writeData(wb, sheet, rdar_dt, startRow = 1, startCol = 1, colNames = TRUE, rowNames = TRUE)
-saveWorkbook(wb, file = paste0(save_fold, 'cross_platform_compare.xlsx'), overwrite = TRUE)
+addWorksheet(wb8,sheet)
+writeData(wb8, sheet, rdar_dt, startRow = 1, startCol = 1, colNames = TRUE, rowNames = TRUE)
+#saveWorkbook(wb8, file = paste0(save_fold, 'cross_platform_compare.xlsx'), overwrite = TRUE)
 pt_rdar_dt<-cbind(pt_rdar_dt, round(rdar_dt[,c(1,2,3,13,14)], 2)) #,4,6
-#pt_rdar_dt$group<-row.names(pt_rdar_dt)
+
 library(ggradar)
 ggradar(pt_rdar_dt,group.colours=c("#a45ee3","#1f11b4","#f078b4","#f2ca01","gray","pink",'red',"orange"),legend.position = 'right')
-#a=c('#5494cc','#e18283','#0d898a','#f9cc52')
+
 col=c("#15d08a","#f2ca01","#a45ee3","#1f11b4","#c3642c",
       "#f078b4", '#5494cc',"gray","pink",'red','orange')
 melt_dt<-melt(pt_rdar_dt)
 melt_dt$value<-round(melt_dt$value,2)
 colnames(melt_dt)[1]<-'method'
-# p3=ggplot(melt_dt, aes(x = variable, y = value, colour = method)) +
-#   geom_bar(aes(fill = method),position=position_dodge(width = 0.5), stat = "identity", width = 0.1) +
-#   geom_point(position=position_dodge(width = 0.1),size=3, shape=19) +
-#   scale_fill_manual(values=col[])
-#   mytheme = theme_classic() + theme(axis.text.x = element_text(size = 16, angle = -20),axis.text.y = element_text(size = 16))+
-#   theme(axis.title.y= element_text(size=16))+theme(axis.title.x = element_text(size = 16))+
-#   theme(legend.title=element_text(size=16),legend.text=element_text(size=16), legend.position = "top")
-#   p3=p3+mytheme
-#   p3
+
 
 ggdotchart(melt_dt, "variable", "value", group = "method", color = "method",
-           palette = col[c(6,1,8,3,10,7,5,4)],
-
+           palette = col[c(6,1,8,3,10,7,5,4, 2, 9, 11)],
+           
            add = "segments", #label = "value",
            add.params = list(color = "lightgray", size = 1),
            dot.size = 3,
-           #label = 'value',
-           #font.label = list(color = "black", size = 9, vjust = 0.5),
            position=position_dodge(width = 0.9)
 ) +
-  #geom_text(aes(label=value), position = 'indentity')+
   theme(axis.text.x = element_text(size = 12, angle = 0, hjust = 0.5),
         axis.title.x = element_blank())#+#+scale_y_continuous(limits = c(0.2, 1))+
-#coord_flip()
 
 
 count_TPs<-data.frame(method=row.names(rdar_dt))
@@ -887,16 +884,16 @@ for (i in 1:length(unique(melt_dt$method))){
   nums<-rbind(nums,num_i)
 }
 
-#Figure 5B
 
 ggbarplot(nums, "method", "value", group = "variable", color = "variable",
           fill="variable", #label = T,lab.pos='in',
           platette = c('#5494cc','#e18283','#0d898a','#f9cc52'),
 ) + geom_text(aes(y=l_y, label=label))+
   scale_x_discrete(limits=c('FG_DDA_ens','MQ_DDA_ens','DIANN_DIA_ens', 'spt_DIA_ens',
-                            'FG_DDA','MQ_DDA','DIANN_DIA','spt_DIA')) +
+                            'FG_DDA','MQ_DDA','DIANN_DIA','spt_DIA'))+#, 'pool_DDA', 'pool_DIA', 'pool_DDA_DIA')) +
   geom_vline(xintercept = 4.5, linetype=2, show.legend=FALSE) + theme(axis.line.y = element_blank())+
   coord_flip()+theme(axis.title.y = element_blank())
+
 
 write.table(nums, paste0(save_fold, 'Figure5B.csv'), col.names = T, row.names = F)
 #############  cross_platform TMT_DDA
@@ -911,12 +908,17 @@ top1wf<-function(dt, platform, acq, contrast){
   base_fold<-data_fold
   dea_res_fold<-paste0(base_fold, acq, '/',platform, '/',dt,'/')
   ranking_all_FG_DDA<-read_excel(paste0(data_fold, 'ranks_all_', platform, '_', acq, '.xlsx'), sheet = 'ranking_all')
-  #ranking_all<-ranking_all[which(ranking_all$runTime!=0 & ranking_all$mean_pauc001!=0 & ranking_all$rank_median_pauc001!=0),]
+  
   wftop1_FG_DDA<-ranking_all_FG_DDA[which(ranking_all_FG_DDA$avg_rank_mean==min(ranking_all_FG_DDA$avg_rank_mean)),]
   if(length((wftop1_FG_DDA$workflow))>1){
     idx=which(wftop1_FG_DDA$avg_rank_median==min(wftop1_FG_DDA$avg_rank_median))
     wftop1_FG_DDA = wftop1_FG_DDA[idx,]
   }
+  print(paste0(dea_res_fold,
+               dt,'_',wftop1_FG_DDA$DEA,'_',
+               wftop1_FG_DDA$Platform,'_',
+               wftop1_FG_DDA$Matrix,'_',gsub('blank','',wftop1_FG_DDA$Imput),
+               '_',gsub('blank','',wftop1_FG_DDA$normalization),'.csv'))
   dea_res_FG_DDA_wf1<-read.table(paste0(dea_res_fold,
                                         dt,'_',wftop1_FG_DDA$DEA,'_',
                                         wftop1_FG_DDA$Platform,'_',
@@ -934,9 +936,9 @@ top1wf_ens<-function(dt, platform, acq, ens_ty, contrast){
   }else if(ens_ty=='ensemble_topk'){
     dea_res_fold<-paste0(base_fold, acq, '/',platform, '/','topk','/',dt,'/')
   }
-  #dea_res_fold<-paste0(base_fold, acq, '/',platform, '/',dt,'/')
+  
   ranking_all_FG_DDA<-read_excel(paste0(data_fold, 'ranks_all_', platform, '_', acq, '_', ens_ty, '.xlsx'), sheet = 'ranking_all')
-  #ranking_all<-ranking_all[which(ranking_all$runTime!=0 & ranking_all$mean_pauc001!=0 & ranking_all$rank_median_pauc001!=0),]
+  
   wftop1_FG_DDA<-ranking_all_FG_DDA[which(ranking_all_FG_DDA$avg_rank_mean==min(ranking_all_FG_DDA$avg_rank_mean)),]
   if(length((wftop1_FG_DDA$workflow))>1){
     idx=which(wftop1_FG_DDA$avg_rank_median==min(wftop1_FG_DDA$avg_rank_median))
@@ -964,11 +966,12 @@ top1wf_ens<-function(dt, platform, acq, ens_ty, contrast){
                                             wftop1_FG_DDA$method,'_',gsub('\\|','-',wftop1_FG_DDA$cbn),'.csv'),
                                      sep = ',',header = T)
     }
-
+    
   }
   dea_res_FG_DDA_wf1<-dea_res_FG_DDA_wf1[which(dea_res_FG_DDA_wf1$contrast==contrast),]
   return(list(wf=wftop1_FG_DDA, dea_res=dea_res_FG_DDA_wf1))
 }
+
 dt = 'HYqfl683'
 contrast='conditionB-conditionA'
 top1_FG_DDA<-top1wf('HYqfl683_LFQ', 'FragPipe', 'DDA',contrast)
@@ -1035,10 +1038,7 @@ DEPs<-data.frame(Proteins=unique(union(union(union(all_protein_FG_DDA$Protein,
                                        all_protein_MQ_TMT$Protein)))
 DEPs$T_YEAST=c(rep(0, length(DEPs$Proteins)))
 DEPs$T_YEAST[match(T_YEAST, DEPs$Proteins)]=1
-# DEPs$T_ECOLI=c(rep(0, length(DEPs$Proteins)))
-# DEPs$T_ECOLI[match(T_ECOLI, DEPs$Proteins)]=1
-# DEPs$T_HUMAN=c(rep(0, length(DEPs$Proteins)))
-# DEPs$T_HUMAN[match(T_HUMAN, DEPs$Proteins)]=1
+
 DEPs$DEP_HUMAN=c(rep(0, length(DEPs$Proteins)))
 DEPs$DEP_HUMAN[match(DEP_HUMAN, DEPs$Proteins)]=1
 DEPs$FG_DDA=c(rep(0, length(DEPs$Proteins)))
@@ -1063,24 +1063,13 @@ DEPs<-DEPs[setdiff(c(1:length(DEPs$Proteins)),grep(';', DEPs$Proteins)),]
 
 sheet=paste(dt, '_cp_DEPs')
 
-addWorksheet(wb,sheet)
-writeData(wb, sheet, DEPs, startRow = 1, startCol = 1, colNames = TRUE, rowNames = TRUE)
-saveWorkbook(wb, file = paste0(save_fold, 'cross_platform_compare.xlsx'), overwrite = TRUE)
-# library(UpSetR)
-# UpSetR::upset(DEPs,
-#               sets = c("T_YEAST", "DEP_HUMAN", "FG_DDA", "MQ_DDA", "FG_TMT","MQ_TMT",
-#                        "FG_DDA_ens", "MQ_DDA_ens", "FG_TMT_ens","MQ_TMT_ens"),
-#               order.by="freq", matrix.color="black", point.size=3,
-#               sets.bar.color=c("#15d08a","#f2ca01","#a45ee3","#1f11b4","#c3642c",
-#                                "#f078b4", '#5494cc',"gray",'red','orange'),mb.ratio=c(0.7, 0.3), text.scale = 1.5,
-#               number.angles =-20)
+addWorksheet(wb8,sheet)
+writeData(wb8, sheet, DEPs, startRow = 1, startCol = 1, colNames = TRUE, rowNames = TRUE)
 
 
 
 library(pROC)
 library(ggpubr)
-
-#all_pvals<-read.table('E:/proteomics/manu4_1/codes/reproduce_0_05/temp0_limma_min_FragPipe/HYEtims735_LFQ_top0_maxlfq_mv_outputs.csv',header = T, sep = ',')
 
 cross_platform_proteins<-data.frame(Proteins=DEPs$Proteins, labels=0)
 cross_platform_proteins$labels[grep('YEAST', cross_platform_proteins$Proteins)]=1
@@ -1150,9 +1139,9 @@ cross_platform_proteins$logFC_MQ_TMT_ens[idx1]=top1_MQ_TMT_ens$dea_res$logFC[idx
 
 sheet=paste(dt, '_cp_proteins')
 
-addWorksheet(wb,sheet)
-writeData(wb, sheet, cross_platform_proteins, startRow = 1, startCol = 1, colNames = TRUE, rowNames = TRUE)
-saveWorkbook(wb, file = paste0(save_fold, 'cross_platform_compare.xlsx'), overwrite = TRUE)
+addWorksheet(wb8,sheet)
+writeData(wb8, sheet, cross_platform_proteins, startRow = 1, startCol = 1, colNames = TRUE, rowNames = TRUE)
+#saveWorkbook(wb8, file = paste0(save_fold, 'cross_platform_compare.xlsx'), overwrite = TRUE)
 
 roc_FG_DDA <- roc(cross_platform_proteins$labels, 1-cross_platform_proteins$qval_FG_DDA)
 roc_MQ_DDA <- roc(cross_platform_proteins$labels, 1-cross_platform_proteins$qval_MQ_DDA)
@@ -1215,7 +1204,6 @@ breaks = seq(0,1,0.1)
 ggplot(spe_sens, aes(x = Specificity, y = Sensitivity, colour = `Method(pAUC(FPR=0.05))`))+
   scale_color_manual(values=c("#15d08a","#f2ca01","#a45ee3","#1f11b4","#c3642c",
                               "#f078b4", '#5494cc',"gray","pink",'red','orange')) +
-  #geom_segment(aes(x = 0, y = 1, xend = 1,yend = 0),linewidth=10, alpha = 0.5, colour = "gray") +
   geom_step(linewidth=1,alpha = 0.9) +
   scale_x_continuous(name = "False Positive Rate (1 - Specificity)",limits = c(0,0.1), breaks = breaks) +
   scale_y_continuous(name = "True Positive Rate (Sensitivity)", limits = c(0,0.7), breaks = breaks) +
@@ -1265,7 +1253,7 @@ cross_platform_metrics<-function(cross_platform_proteins, setting, roc){
   TN=length(which(lab==0 & (abs(logFCs)<=log2(1.5) | qvals>0.05)))
   FP=length(which(lab==0 & abs(logFCs)>=log2(1.5) & qvals<=0.05))
   FN=length(which(lab==1 & (abs(logFCs)<=log2(1.5) | qvals>0.05)))
-
+  
   Recall = TP/(TP+FN)
   Precision = TP/(TP+FP)
   Specificity = TN/(TN+FP)
@@ -1273,7 +1261,7 @@ cross_platform_metrics<-function(cross_platform_proteins, setting, roc){
   MCC = (TP*TN-FP*FN)/(((TP+FP)^0.5)*((TP+FN)^0.5)*((TN+FP)^0.5)*((TN+FN))^0.5)
   Gmean = (Recall*Specificity)^0.5
   nMCC = (1+MCC)/2
-
+  
   pauc001=as.numeric(auc(roc_s, partial.auc=c(1, 0.99), partial.auc.correct=TRUE))
   pauc005=as.numeric(auc(roc_s, partial.auc=c(1, 0.95), partial.auc.correct=TRUE))
   pauc01=as.numeric(auc(roc_s, partial.auc=c(1, 0.90), partial.auc.correct=TRUE))
@@ -1302,9 +1290,9 @@ row.names(rdar_dt)<-c('FG_DDA','MQ_DDA', 'FG_TMT', 'MQ_TMT', 'FG_DDA_ens',
 rdar_dt<-as.data.frame(as.matrix(rdar_dt))
 sheet=paste(dt, '_cp_metrics')
 
-addWorksheet(wb,sheet)
-writeData(wb, sheet, rdar_dt, startRow = 1, startCol = 1, colNames = TRUE, rowNames = TRUE)
-saveWorkbook(wb, file = paste0(save_fold, 'cross_platform_compare.xlsx'), overwrite = TRUE)
+addWorksheet(wb8,sheet)
+writeData(wb8, sheet, rdar_dt, startRow = 1, startCol = 1, colNames = TRUE, rowNames = TRUE)
+saveWorkbook(wb8, file = paste0(save_fold, 'cross_platform_compare.xlsx'), overwrite = TRUE)
 pt_rdar_dt<-data.frame(group=row.names(rdar_dt))
 pt_rdar_dt<-cbind(pt_rdar_dt, rdar_dt[,c(1,2,3,13,14)]) #,4,6
 
@@ -1313,18 +1301,14 @@ col=c("#15d08a","#f2ca01","#a45ee3","#1f11b4","#c3642c",
 melt_dt<-melt(pt_rdar_dt)
 colnames(melt_dt)[1]<-'method'
 
-
 ggdotchart(melt_dt, "variable", "value", group = "method", color = "method",
            palette = col[c(6,1,8,3,10,7,5,4)],
-
+           
            add = "segments", #label = "value",
            add.params = list(color = "lightgray", size = 1),
            dot.size = 3,
-           #label = 'value',
-           #font.label = list(color = "black", size = 9, vjust = 0.5),
            position=position_dodge(width = 0.9)
 ) +
-  #geom_text(aes(label=value), position = 'indentity')+
   theme(axis.text.x = element_text(size = 12, angle = 0, hjust = 0.5),
         axis.title.x = element_blank())#+#+scale_y_continuous(limits = c(0.2, 1))+
 
@@ -1357,8 +1341,6 @@ for (i in 1:length(unique(melt_dt$method))){
   nums<-rbind(nums,num_i)
 }
 
-
-## Figure 5C
 ggbarplot(nums, "method", "value", group = "variable", color = "variable",
           fill="variable", #label = T,lab.pos='in',
           platette = c('#5494cc','#e18283','#0d898a','#f9cc52'),
@@ -1369,827 +1351,6 @@ ggbarplot(nums, "method", "value", group = "variable", color = "variable",
   coord_flip()+theme(axis.title.y = element_blank())
 
 write.table(nums, paste0(save_fold, 'Figure5C.csv'), col.names = T, row.names = F)
-###################################################
-################# HEqe408
-##############
-################
-
-top1wf<-function(dt, platform, acq){
-  base_fold<-data_fold
-  dea_res_fold<-paste0(base_fold, acq, '/',platform, '/',dt,'/')
-  ranking_all_FG_DDA<-read_excel(paste0(data_fold, 'ranks_all_', platform, '_', acq, '.xlsx'), sheet = 'ranking_all')
-  #ranking_all<-ranking_all[which(ranking_all$runTime!=0 & ranking_all$mean_pauc001!=0 & ranking_all$rank_median_pauc001!=0),]
-  wftop1_FG_DDA<-ranking_all_FG_DDA[which(ranking_all_FG_DDA$avg_rank_mean==min(ranking_all_FG_DDA$avg_rank_mean)),]
-  if(length((wftop1_FG_DDA$workflow))>1){
-    idx=which(wftop1_FG_DDA$avg_rank_median==min(wftop1_FG_DDA$avg_rank_median))
-    wftop1_FG_DDA = wftop1_FG_DDA[idx,]
-  }
-  dea_res_FG_DDA_wf1<-read.table(paste0(dea_res_fold,
-                                        dt,'_',wftop1_FG_DDA$DEA,'_',
-                                        wftop1_FG_DDA$Platform,'_',
-                                        wftop1_FG_DDA$Matrix,'_',gsub('blank','',wftop1_FG_DDA$Imput),
-                                        '_',gsub('blank','',wftop1_FG_DDA$normalization),'.csv'),
-                                 sep = ',',header = T)
-  return(list(wf=wftop1_FG_DDA, dea_res=dea_res_FG_DDA_wf1))
-}
-
-top1wf_ens<-function(dt, platform, acq, ens_ty){
-  base_fold<-data_fold
-  if(ens_ty=='ensemble_mv'){
-    dea_res_fold<-paste0(base_fold, acq, '/',platform, '/','mv','/',dt,'/')
-  }else if(ens_ty=='ensemble_topk'){
-    dea_res_fold<-paste0(base_fold, acq, '/',platform, '/','topk','/',dt,'/')
-  }
-  #dea_res_fold<-paste0(base_fold, acq, '/',platform, '/',dt,'/')
-  ranking_all_FG_DDA<-read_excel(paste0(data_fold, 'ranks_all_', platform, '_', acq, '_', ens_ty, '.xlsx'), sheet = 'ranking_all')
-  #ranking_all<-ranking_all[which(ranking_all$runTime!=0 & ranking_all$mean_pauc001!=0 & ranking_all$rank_median_pauc001!=0),]
-  wftop1_FG_DDA<-ranking_all_FG_DDA[which(ranking_all_FG_DDA$avg_rank_mean==min(ranking_all_FG_DDA$avg_rank_mean)),]
-  if(length((wftop1_FG_DDA$workflow))>1){
-    idx=which(wftop1_FG_DDA$avg_rank_median==min(wftop1_FG_DDA$avg_rank_median))
-    wftop1_FG_DDA = wftop1_FG_DDA[idx,]
-  }
-  if(wftop1_FG_DDA$method=='set'){
-    dea_res_FG_DDA_wf1<-read.table(paste0(dea_res_fold,
-                                          dt,'_',
-                                          wftop1_FG_DDA$Platform,'_',
-                                          wftop1_FG_DDA$method, '_',
-                                          wftop1_FG_DDA$operation,
-                                          '_',gsub('\\|','-',wftop1_FG_DDA$cbn),'.csv'),
-                                   sep = ',',header = T)
-  }else{
-    dea_res_FG_DDA_wf1<-read.table(paste0(dea_res_fold,
-                                          dt,'_',
-                                          wftop1_FG_DDA$Platform,'_',
-                                          wftop1_FG_DDA$method,'_',gsub('\\|','-',wftop1_FG_DDA$cbn),'.csv'),
-                                   sep = ',',header = T)
-  }
-
-  return(list(wf=wftop1_FG_DDA, dea_res=dea_res_FG_DDA_wf1))
-}
-
-dt='HEqe408'
-
-all_protein_FG_DDA<-read.table(paste0(data_fold, 'HEqe408_LFQ_FragPipe_all_proteins.tsv'), sep = '\t', header = T)
-all_protein_MQ_DDA<-read.table(paste0(data_fold, 'HEqe408_LFQ_Maxquant_all_proteins.tsv'), sep = '\t', header = T)
-all_protein_DIANN_DIA<-read.table(paste0(data_fold, 'HEqe408_DIA_DIANN_all_proteins.tsv'), sep = '\t', header = T)
-all_protein_spt_DIA<-read.table(paste0(data_fold, 'HEqe408_DIA_spt_all_proteins.tsv'), sep = '\t', header = T)
-
-top1_FG_DDA<-top1wf('HEqe408_LFQ', 'FragPipe', 'DDA')
-top1_MQ_DDA<-top1wf('HEqe408_LFQ', 'Maxquant', 'DDA')
-top1_DIANN_DIA<-top1wf('HEqe408_DIA', 'DIANN', 'DIA')
-top1_spt_DIA<-top1wf('HEqe408_DIA', 'spt', 'DIA')
-top1_FG_DDA_ens=top1wf_ens('HEqe408_LFQ', 'FragPipe', 'DDA', 'ensemble_mv')
-top1_MQ_DDA_ens=top1wf_ens('HEqe408_LFQ', 'Maxquant', 'DDA', 'ensemble_mv')
-top1_DIANN_DIA_ens=top1wf_ens('HEqe408_DIA', 'DIANN', 'DIA', 'ensemble_mv')
-top1_spt_DIA_ens=top1wf_ens('HEqe408_DIA', 'spt', 'DIA', 'ensemble_mv')
-
-
-
-FG_DDA<-top1_FG_DDA$dea_res$protein[which(abs(top1_FG_DDA$dea_res$logFC)>=log2(1.5) & top1_FG_DDA$dea_res$adj.pvalue<=0.05)]
-MQ_DDA<-top1_MQ_DDA$dea_res$protein[which(abs(top1_MQ_DDA$dea_res$logFC)>=log2(1.5) & top1_MQ_DDA$dea_res$adj.pvalue<=0.05)]
-DIANN_DIA<-top1_DIANN_DIA$dea_res$protein[which(abs(top1_DIANN_DIA$dea_res$logFC)>=log2(1.5) & top1_DIANN_DIA$dea_res$adj.pvalue<=0.05)]
-spt_DIA<-top1_spt_DIA$dea_res$protein[which(abs(top1_spt_DIA$dea_res$logFC)>=log2(1.5) & top1_spt_DIA$dea_res$adj.pvalue<=0.05)]
-
-FG_DDA_ens<-top1_FG_DDA_ens$dea_res$protein[which(abs(top1_FG_DDA_ens$dea_res$logFC)>=log2(1.5) & top1_FG_DDA_ens$dea_res$adj.pvalue<=0.05)]
-MQ_DDA_ens<-top1_MQ_DDA_ens$dea_res$protein[which(abs(top1_MQ_DDA_ens$dea_res$logFC)>=log2(1.5) & top1_MQ_DDA_ens$dea_res$adj.pvalue<=0.05)]
-DIANN_DIA_ens<-top1_DIANN_DIA_ens$dea_res$protein[which(abs(top1_DIANN_DIA_ens$dea_res$logFC)>=log2(1.5) & top1_DIANN_DIA_ens$dea_res$adj.pvalue<=0.05)]
-spt_DIA_ens<-top1_spt_DIA_ens$dea_res$protein[which(abs(top1_spt_DIA_ens$dea_res$logFC)>=log2(1.5) & top1_spt_DIA_ens$dea_res$adj.pvalue<=0.05)]
-
-
-# T_YEAST<-unique(union(union(union(all_protein_FG_DDA$Protein[which(all_protein_FG_DDA$Organism=='YEAST')],
-#                                   all_protein_MQ_DDA$Protein[which(all_protein_MQ_DDA$Organism=='YEAST')]),
-#                             all_protein_DIANN_DIA$Protein[which(all_protein_DIANN_DIA$Organism=='YEAST')]),
-#                       all_protein_spt_DIA$Protein[which(all_protein_spt_DIA$Organism=='YEAST')]))
-T_ECOLI<-unique(union(union(union(all_protein_FG_DDA$Protein[which(all_protein_FG_DDA$Organism=='ECOLI')],
-                                  all_protein_MQ_DDA$Protein[which(all_protein_MQ_DDA$Organism=='ECOLI')]),
-                            all_protein_DIANN_DIA$Protein[which(all_protein_DIANN_DIA$Organism=='ECOLI')]),
-                      all_protein_spt_DIA$Protein[which(all_protein_spt_DIA$Organism=='ECOLI')]))
-T_HUMAN<-unique(union(union(union(all_protein_FG_DDA$Protein[which(all_protein_FG_DDA$Organism=='HUMAN')],
-                                  all_protein_MQ_DDA$Protein[which(all_protein_MQ_DDA$Organism=='HUMAN')]),
-                            all_protein_DIANN_DIA$Protein[which(all_protein_DIANN_DIA$Organism=='HUMAN')]),
-                      all_protein_spt_DIA$Protein[which(all_protein_spt_DIA$Organism=='HUMAN')]))
-
-DEP_HUMAN<-unique(union(union(union(top1_FG_DDA$dea_res$protein[which(abs(top1_FG_DDA$dea_res$logFC)>=log2(1.5) &
-                                                                        top1_FG_DDA$dea_res$adj.pvalue<=0.05 &
-                                                                        top1_FG_DDA$dea_res$organism=='HUMAN')],
-                                    top1_MQ_DDA$dea_res$protein[which(abs(top1_MQ_DDA$dea_res$logFC)>=log2(1.5) &
-                                                                        top1_MQ_DDA$dea_res$adj.pvalue<=0.05 &
-                                                                        top1_MQ_DDA$dea_res$organism=='HUMAN')]),
-                              top1_DIANN_DIA$dea_res$protein[which(abs(top1_DIANN_DIA$dea_res$logFC)>=log2(1.5) &
-                                                                     top1_DIANN_DIA$dea_res$adj.pvalue<=0.05 &
-                                                                     top1_DIANN_DIA$dea_res$organism=='HUMAN')]),
-                        top1_spt_DIA$dea_res$protein[which(abs(top1_spt_DIA$dea_res$logFC)>=log2(1.5) &
-                                                             top1_spt_DIA$dea_res$adj.pvalue<=0.05 &
-                                                             top1_spt_DIA$dea_res$organism=='HUMAN')]))
-
-
-DEP_HUMAN_ens<-unique(union(union(union(top1_FG_DDA_ens$dea_res$protein[which(abs(top1_FG_DDA_ens$dea_res$logFC)>=log2(1.5) &
-                                                                                top1_FG_DDA_ens$dea_res$adj.pvalue<=0.05 &
-                                                                                top1_FG_DDA_ens$dea_res$organism=='HUMAN')],
-                                        top1_MQ_DDA_ens$dea_res$protein[which(abs(top1_MQ_DDA_ens$dea_res$logFC)>=log2(1.5) &
-                                                                                top1_MQ_DDA_ens$dea_res$adj.pvalue<=0.05 &
-                                                                                top1_MQ_DDA_ens$dea_res$organism=='HUMAN')]),
-                                  top1_DIANN_DIA_ens$dea_res$protein[which(abs(top1_DIANN_DIA_ens$dea_res$logFC)>=log2(1.5) &
-                                                                             top1_DIANN_DIA_ens$dea_res$adj.pvalue<=0.05 &
-                                                                             top1_DIANN_DIA_ens$dea_res$organism=='HUMAN')]),
-                            top1_spt_DIA_ens$dea_res$protein[which(abs(top1_spt_DIA_ens$dea_res$logFC)>=log2(1.5) &
-                                                                     top1_spt_DIA_ens$dea_res$adj.pvalue<=0.05 &
-                                                                     top1_spt_DIA_ens$dea_res$organism=='HUMAN')]))
-
-DEP_HUMAN<-unique(union(DEP_HUMAN, DEP_HUMAN_ens))
-
-DEPs<-data.frame(Proteins=unique(union(union(union(all_protein_FG_DDA$Protein,
-                                                   all_protein_MQ_DDA$Protein),
-                                             all_protein_DIANN_DIA$Protein),
-                                       all_protein_spt_DIA$Protein)))
-# DEPs$T_YEAST=c(rep(0, length(DEPs$Proteins)))
-# DEPs$T_YEAST[match(T_YEAST, DEPs$Proteins)]=1
-DEPs$T_ECOLI=c(rep(0, length(DEPs$Proteins)))
-DEPs$T_ECOLI[match(T_ECOLI, DEPs$Proteins)]=1
-# DEPs$T_HUMAN=c(rep(0, length(DEPs$Proteins)))
-# DEPs$T_HUMAN[match(T_HUMAN, DEPs$Proteins)]=1
-DEPs$DEP_HUMAN=c(rep(0, length(DEPs$Proteins)))
-DEPs$DEP_HUMAN[match(DEP_HUMAN, DEPs$Proteins)]=1
-DEPs$FG_DDA=c(rep(0, length(DEPs$Proteins)))
-DEPs$FG_DDA[match(FG_DDA, DEPs$Proteins)]=1
-DEPs$MQ_DDA=c(rep(0, length(DEPs$Proteins)))
-DEPs$MQ_DDA[match(MQ_DDA, DEPs$Proteins)]=1
-DEPs$DIANN_DIA=c(rep(0, length(DEPs$Proteins)))
-DEPs$DIANN_DIA[match(DIANN_DIA, DEPs$Proteins)]=1
-DEPs$spt_DIA=c(rep(0, length(DEPs$Proteins)))
-DEPs$spt_DIA[match(spt_DIA, DEPs$Proteins)]=1
-
-DEPs$FG_DDA_ens=c(rep(0, length(DEPs$Proteins)))
-DEPs$FG_DDA_ens[match(FG_DDA_ens, DEPs$Proteins)]=1
-DEPs$MQ_DDA_ens=c(rep(0, length(DEPs$Proteins)))
-DEPs$MQ_DDA_ens[match(MQ_DDA_ens, DEPs$Proteins)]=1
-DEPs$DIANN_DIA_ens=c(rep(0, length(DEPs$Proteins)))
-DEPs$DIANN_DIA_ens[match(DIANN_DIA_ens, DEPs$Proteins)]=1
-DEPs$spt_DIA_ens=c(rep(0, length(DEPs$Proteins)))
-DEPs$spt_DIA_ens[match(spt_DIA_ens, DEPs$Proteins)]=1
-
-# simply remove protein groups
-DEPs<-DEPs[setdiff(c(1:length(DEPs$Proteins)),grep(';', DEPs$Proteins)),]
-
-sheet=paste(dt, '_cp_DEPs')
-
-addWorksheet(wb,sheet)
-writeData(wb, sheet, DEPs, startRow = 1, startCol = 1, colNames = TRUE, rowNames = TRUE)
-saveWorkbook(wb, file = paste0(save_fold, 'cross_platform_compare.xlsx'), overwrite = TRUE)
-
-
-# UpSetR::upset(DEPs,
-#               sets = c("T_YEAST", "T_ECOLI", "DEP_HUMAN", "FG_DDA", "MQ_DDA", "DIANN_DIA","spt_DIA","FG_DDA_ens","MQ_DDA_ens", "DIANN_DIA_ens","spt_DIA_ens"),
-#               order.by="freq", matrix.color="black", point.size=3,
-#               sets.bar.color=c("#15d08a","#f2ca01","#a45ee3","#1f11b4","#c3642c",
-#                                "#f078b4", '#5494cc',"gray","pink",'red','orange'),mb.ratio=c(0.5, 0.5), text.scale = 1.5,
-#               number.angles =0)
-
-library(pROC)
-library(ggpubr)
-
-#all_pvals<-read.table('E:/proteomics/manu4_1/codes/reproduce_0_05/temp0_limma_min_FragPipe/HYEtims735_LFQ_top0_maxlfq_mv_outputs.csv',header = T, sep = ',')
-
-cross_platform_proteins<-data.frame(Proteins=DEPs$Proteins, labels=0)
-#cross_platform_proteins$labels[grep('YEAST', cross_platform_proteins$Proteins)]=1
-cross_platform_proteins$labels[grep('ECOLI', cross_platform_proteins$Proteins)]=1
-cross_platform_proteins$qval_FG_DDA<-1
-cross_platform_proteins$logFC_FG_DDA<-0
-com=intersect(cross_platform_proteins$Proteins, top1_FG_DDA$dea_res$protein)
-idx1=match(com, cross_platform_proteins$Proteins)
-idx2=match(com, top1_FG_DDA$dea_res$protein)
-cross_platform_proteins$qval_FG_DDA[idx1]=top1_FG_DDA$dea_res$adj.pvalue[idx2]
-cross_platform_proteins$logFC_FG_DDA[idx1]=top1_FG_DDA$dea_res$logFC[idx2]
-
-cross_platform_proteins$qval_MQ_DDA<-1
-cross_platform_proteins$logFC_MQ_DDA<-0
-com=intersect(cross_platform_proteins$Proteins, top1_MQ_DDA$dea_res$protein)
-idx1=match(com, cross_platform_proteins$Proteins)
-idx2=match(com, top1_MQ_DDA$dea_res$protein)
-cross_platform_proteins$qval_MQ_DDA[idx1]=top1_MQ_DDA$dea_res$adj.pvalue[idx2]
-cross_platform_proteins$logFC_MQ_DDA[idx1]=top1_MQ_DDA$dea_res$logFC[idx2]
-
-cross_platform_proteins$qval_DIANN_DIA<-1
-cross_platform_proteins$logFC_DIANN_DIA<-0
-com=intersect(cross_platform_proteins$Proteins, top1_DIANN_DIA$dea_res$protein)
-idx1=match(com, cross_platform_proteins$Proteins)
-idx2=match(com, top1_DIANN_DIA$dea_res$protein)
-cross_platform_proteins$qval_DIANN_DIA[idx1]=top1_DIANN_DIA$dea_res$adj.pvalue[idx2]
-cross_platform_proteins$logFC_DIANN_DIA[idx1]=top1_DIANN_DIA$dea_res$logFC[idx2]
-
-cross_platform_proteins$qval_spt_DIA<-1
-cross_platform_proteins$logFC_spt_DIA<-0
-com=intersect(cross_platform_proteins$Proteins, top1_spt_DIA$dea_res$protein)
-idx1=match(com, cross_platform_proteins$Proteins)
-idx2=match(com, top1_spt_DIA$dea_res$protein)
-cross_platform_proteins$qval_spt_DIA[idx1]=top1_spt_DIA$dea_res$adj.pvalue[idx2]
-cross_platform_proteins$logFC_spt_DIA[idx1]=top1_spt_DIA$dea_res$logFC[idx2]
-
-cross_platform_proteins$qval_FG_DDA_ens<-1
-cross_platform_proteins$logFC_FG_DDA_ens<-0
-com=intersect(cross_platform_proteins$Proteins, top1_FG_DDA_ens$dea_res$protein)
-idx1=match(com, cross_platform_proteins$Proteins)
-idx2=match(com, top1_FG_DDA_ens$dea_res$protein)
-cross_platform_proteins$qval_FG_DDA_ens[idx1]=top1_FG_DDA_ens$dea_res$adj.pvalue[idx2]
-cross_platform_proteins$logFC_FG_DDA_ens[idx1]=top1_FG_DDA_ens$dea_res$logFC[idx2]
-
-cross_platform_proteins$qval_MQ_DDA_ens<-1
-cross_platform_proteins$logFC_MQ_DDA_ens<-0
-com=intersect(cross_platform_proteins$Proteins, top1_MQ_DDA_ens$dea_res$protein)
-idx1=match(com, cross_platform_proteins$Proteins)
-idx2=match(com, top1_MQ_DDA_ens$dea_res$protein)
-cross_platform_proteins$qval_MQ_DDA_ens[idx1]=top1_MQ_DDA_ens$dea_res$adj.pvalue[idx2]
-cross_platform_proteins$logFC_MQ_DDA_ens[idx1]=top1_MQ_DDA_ens$dea_res$logFC[idx2]
-
-cross_platform_proteins$qval_DIANN_DIA_ens<-1
-cross_platform_proteins$logFC_DIANN_DIA_ens<-0
-com=intersect(cross_platform_proteins$Proteins, top1_DIANN_DIA_ens$dea_res$protein)
-idx1=match(com, cross_platform_proteins$Proteins)
-idx2=match(com, top1_DIANN_DIA_ens$dea_res$protein)
-cross_platform_proteins$qval_DIANN_DIA_ens[idx1]=top1_DIANN_DIA_ens$dea_res$adj.pvalue[idx2]
-cross_platform_proteins$logFC_DIANN_DIA_ens[idx1]=top1_DIANN_DIA_ens$dea_res$logFC[idx2]
-
-cross_platform_proteins$qval_spt_DIA_ens<-1
-cross_platform_proteins$logFC_spt_DIA_ens<-0
-com=intersect(cross_platform_proteins$Proteins, top1_spt_DIA_ens$dea_res$protein)
-idx1=match(com, cross_platform_proteins$Proteins)
-idx2=match(com, top1_spt_DIA_ens$dea_res$protein)
-cross_platform_proteins$qval_spt_DIA_ens[idx1]=top1_spt_DIA_ens$dea_res$adj.pvalue[idx2]
-cross_platform_proteins$logFC_spt_DIA_ens[idx1]=top1_spt_DIA_ens$dea_res$logFC[idx2]
-
-sheet=paste(dt, '_cp_proteins')
-
-addWorksheet(wb,sheet)
-writeData(wb, sheet, cross_platform_proteins, startRow = 1, startCol = 1, colNames = TRUE, rowNames = TRUE)
-saveWorkbook(wb, file = paste0(save_fold, 'cross_platform_compare.xlsx'), overwrite = TRUE)
-
-roc_FG_DDA <- roc(cross_platform_proteins$labels, 1-cross_platform_proteins$qval_FG_DDA)
-roc_MQ_DDA <- roc(cross_platform_proteins$labels, 1-cross_platform_proteins$qval_MQ_DDA)
-roc_DIANN_DIA <- roc(cross_platform_proteins$labels, 1-cross_platform_proteins$qval_DIANN_DIA)
-roc_spt_DIA <- roc(cross_platform_proteins$labels, 1-cross_platform_proteins$qval_spt_DIA)
-
-roc_FG_DDA_ens <- roc(cross_platform_proteins$labels, 1-cross_platform_proteins$qval_FG_DDA_ens)
-roc_MQ_DDA_ens <- roc(cross_platform_proteins$labels, 1-cross_platform_proteins$qval_MQ_DDA_ens)
-roc_DIANN_DIA_ens <- roc(cross_platform_proteins$labels, 1-cross_platform_proteins$qval_DIANN_DIA_ens)
-roc_spt_DIA_ens <- roc(cross_platform_proteins$labels, 1-cross_platform_proteins$qval_spt_DIA_ens)
-
-
-cross_platform_metrics<-function(cross_platform_proteins, setting, roc){
-  lab=cross_platform_proteins$labels
-  if(setting=='FG_DDA'){
-    logFCs=cross_platform_proteins$logFC_FG_DDA
-    qvals=cross_platform_proteins$qval_FG_DDA
-    roc_s<-roc_FG_DDA
-  }else if(setting=='MQ_DDA'){
-    logFCs=cross_platform_proteins$logFC_MQ_DDA
-    qvals=cross_platform_proteins$qval_MQ_DDA
-    roc_s<-roc_MQ_DDA
-  }else if(setting=='DIANN_DIA'){
-    logFCs=cross_platform_proteins$logFC_DIANN_DIA
-    qvals=cross_platform_proteins$qval_DIANN_DIA
-    roc_s<-roc_DIANN_DIA
-  }else if(setting=='spt_DIA'){
-    logFCs=cross_platform_proteins$logFC_spt_DIA
-    qvals=cross_platform_proteins$qval_spt_DIA
-    roc_s<-roc_spt_DIA
-  }else if(setting=='FG_DDA_ens'){
-    logFCs=cross_platform_proteins$logFC_FG_DDA_ens
-    qvals=cross_platform_proteins$qval_FG_DDA_ens
-    roc_s<-roc_FG_DDA_ens
-  }else if(setting=='MQ_DDA_ens'){
-    logFCs=cross_platform_proteins$logFC_MQ_DDA_ens
-    qvals=cross_platform_proteins$qval_MQ_DDA_ens
-    roc_s<-roc_MQ_DDA_ens
-  }else if(setting=='DIANN_DIA_ens'){
-    logFCs=cross_platform_proteins$logFC_DIANN_DIA_ens
-    qvals=cross_platform_proteins$qval_DIANN_DIA_ens
-    roc_s<-roc_DIANN_DIA_ens
-  }else if(setting=='spt_DIA_ens'){
-    logFCs=cross_platform_proteins$logFC_spt_DIA_ens
-    qvals=cross_platform_proteins$qval_spt_DIA_ens
-    roc_s<-roc_spt_DIA_ens
-  }
-  TP=length(which(lab==1 & abs(logFCs)>=log2(1.5) & qvals<=0.05))
-  TN=length(which(lab==0 & (abs(logFCs)<=log2(1.5) | qvals>0.05)))
-  FP=length(which(lab==0 & abs(logFCs)>=log2(1.5) & qvals<=0.05))
-  FN=length(which(lab==1 & (abs(logFCs)<=log2(1.5) | qvals>0.05)))
-
-  Recall = TP/(TP+FN)
-  Precision = TP/(TP+FP)
-  Specificity = TN/(TN+FP)
-  F1=2*Recall*Precision/(Recall+Precision)
-  MCC = (TP*TN-FP*FN)/(((TP+FP)^0.5)*((TP+FN)^0.5)*((TN+FP)^0.5)*((TN+FN))^0.5)
-  Gmean = (Recall*Specificity)^0.5
-  nMCC = (1+MCC)/2
-
-  pauc001=as.numeric(auc(roc_s, partial.auc=c(1, 0.99), partial.auc.correct=TRUE))
-  pauc005=as.numeric(auc(roc_s, partial.auc=c(1, 0.95), partial.auc.correct=TRUE))
-  pauc01=as.numeric(auc(roc_s, partial.auc=c(1, 0.90), partial.auc.correct=TRUE))
-  metrics=data.frame(metric=c('pAUC(0.01)','pAUC(0.05)','pAUC(0.1)','TP', 'TN', 'FP', 'FN', 'Recall', 'Precision', 'Specificity', 'F1', 'MCC', 'G-mean','nMCC'),
-                     value=c(pauc001,pauc005,pauc01,TP, TN, FP, FN, Recall, Precision, Specificity, F1, MCC, Gmean,nMCC))
-  return(metrics)
-}
-
-metrics_FG_DDA=cross_platform_metrics(cross_platform_proteins, 'FG_DDA', roc_FG_DDA)
-metrics_MQ_DDA=cross_platform_metrics(cross_platform_proteins, 'MQ_DDA', roc_MQ_DDA)
-metrics_DIANN_DIA=cross_platform_metrics(cross_platform_proteins, 'DIANN_DIA', roc_DIANN_DIA)
-metrics_spt_DIA=cross_platform_metrics(cross_platform_proteins, 'spt_DIA', roc_spt_DIA)
-
-metrics_FG_DDA_ens=cross_platform_metrics(cross_platform_proteins, 'FG_DDA_ens', roc_FG_DDA_ens)
-metrics_MQ_DDA_ens=cross_platform_metrics(cross_platform_proteins, 'MQ_DDA_ens', roc_MQ_DDA_ens)
-metrics_DIANN_DIA_ens=cross_platform_metrics(cross_platform_proteins, 'DIANN_DIA_ens', roc_DIANN_DIA_ens)
-metrics_spt_DIA_ens=cross_platform_metrics(cross_platform_proteins, 'spt_DIA_ens', roc_spt_DIA_ens)
-
-rdar_dt<-rbind(metrics_FG_DDA$value, metrics_MQ_DDA$value, metrics_DIANN_DIA$value, metrics_spt_DIA$value,
-               metrics_FG_DDA_ens$value, metrics_MQ_DDA_ens$value, metrics_DIANN_DIA_ens$value, metrics_spt_DIA_ens$value)
-colnames(rdar_dt)<-metrics_FG_DDA$metric
-row.names(rdar_dt)<-c('FG_DDA','MQ_DDA', 'DIANN_DIA', 'spt_DIA', 'FG_DDA_ens','MQ_DDA_ens', 'DIANN_DIA_ens', 'spt_DIA_ens')
-rdar_dt<-as.data.frame(as.matrix(rdar_dt))
-pt_rdar_dt<-data.frame(group=row.names(rdar_dt))
-
-sheet=paste(dt, '_cp_metrics')
-
-addWorksheet(wb,sheet)
-writeData(wb, sheet, rdar_dt, startRow = 1, startCol = 1, colNames = TRUE, rowNames = TRUE)
-saveWorkbook(wb, file = paste0(save_fold, 'cross_platform_compare.xlsx'), overwrite = TRUE)
-pt_rdar_dt<-cbind(pt_rdar_dt, rdar_dt[,c(1,2,3,13,14)]) #,4,6
-#pt_rdar_dt$group<-row.names(pt_rdar_dt)
-library(ggradar)
-ggradar(pt_rdar_dt,group.colours=c("#a45ee3","#1f11b4","#f078b4","#f2ca01","gray","pink",'red',"orange"),legend.position = 'right')
-#a=c('#5494cc','#e18283','#0d898a','#f9cc52')
-col=c("#15d08a","#f2ca01","#a45ee3","#1f11b4","#c3642c",
-      "#f078b4", '#5494cc',"gray","pink",'red','orange')
-melt_dt<-melt(pt_rdar_dt)
-colnames(melt_dt)[1]<-'method'
-
-ggdotchart(melt_dt, "variable", "value", group = "method", color = "method",
-           palette = col[c(6,1,8,3,10,7,5,4)],
-
-           add = "segments", #label = "value",
-           add.params = list(color = "lightgray", size = 1),
-           dot.size = 3,
-           #label = 'value',
-           #font.label = list(color = "black", size = 9, vjust = 0.5),
-           position=position_dodge(width = 0.9)
-) +
-  #geom_text(aes(label=value), position = 'indentity')+
-  theme(axis.text.x = element_text(size = 12, angle = 0, hjust = 0.5),
-        axis.title.x = element_blank())#+#+scale_y_continuous(limits = c(0.2, 1))+
-#coord_flip()
-
-
-count_TPs<-data.frame(method=row.names(rdar_dt))
-count_TPs<-cbind(count_TPs, rdar_dt[,c(4:7)]) #,4,6
-melt_dt<-melt(count_TPs)
-melt_dt$label<-as.character(melt_dt$value)
-melt_dt$label[which(melt_dt$variable=='TN' | melt_dt$variable=='FN')]=''
-
-nums<-vector()
-
-
-for (i in 1:length(unique(melt_dt$method))){
-  num_i<-melt_dt[which(melt_dt$method==melt_dt$method[i]),]
-  uni_var<-levels(factor(melt_dt$variable))
-  re_order<-match(num_i$variable, uni_var)
-  num_i<-num_i[re_order,]
-  l_y<-c(rep(0,length(uni_var)))
-  for (j in length(uni_var):1) {
-    if(j==length(uni_var)){
-      l_y[j]=num_i$value[j]/2
-    }else{
-      l_y_j=num_i$value[j]/2 + sum(num_i$value[c((j+1):length(uni_var))])
-      l_y[j]=l_y_j
-    }
-  }
-  num_i$l_y<-l_y
-  nums<-rbind(nums,num_i)
-}
-
-# supp. Fig. 5
-
-ggbarplot(nums, "method", "value", group = "variable", color = "variable",
-          fill="variable", #label = T,lab.pos='in',
-          platette = c('#5494cc','#e18283','#0d898a','#f9cc52'),
-) + geom_text(aes(y=l_y, label=label))+
-  scale_x_discrete(limits=c('FG_DDA_ens','MQ_DDA_ens','DIANN_DIA_ens', 'spt_DIA_ens',
-                            'FG_DDA','MQ_DDA','DIANN_DIA','spt_DIA')) +
-  geom_vline(xintercept = 4.5, linetype=2, show.legend=FALSE) + theme(axis.line.y = element_blank())+
-  coord_flip()+theme(axis.title.y = element_blank())
-###################################################
-################# HYtims134
-##############
-################
-
-top1wf<-function(dt, platform, acq, contrast){
-  base_fold<-data_fold
-  dea_res_fold<-paste0(base_fold, acq, '/',platform, '/',dt,'/')
-  ranking_all_FG_DDA<-read_excel(paste0(data_fold, 'ranks_all_', platform, '_', acq, '.xlsx'), sheet = 'ranking_all')
-  #ranking_all<-ranking_all[which(ranking_all$runTime!=0 & ranking_all$mean_pauc001!=0 & ranking_all$rank_median_pauc001!=0),]
-  wftop1_FG_DDA<-ranking_all_FG_DDA[which(ranking_all_FG_DDA$avg_rank_mean==min(ranking_all_FG_DDA$avg_rank_mean)),]
-  if(length((wftop1_FG_DDA$workflow))>1){
-    idx=which(wftop1_FG_DDA$avg_rank_median==min(wftop1_FG_DDA$avg_rank_median))
-    wftop1_FG_DDA = wftop1_FG_DDA[idx,]
-  }
-  dea_res_FG_DDA_wf1<-read.table(paste0(dea_res_fold,
-                                        dt,'_',wftop1_FG_DDA$DEA,'_',
-                                        wftop1_FG_DDA$Platform,'_',
-                                        wftop1_FG_DDA$Matrix,'_',gsub('blank','',wftop1_FG_DDA$Imput),
-                                        '_',gsub('blank','',wftop1_FG_DDA$normalization),'.csv'),
-                                 sep = ',',header = T)
-  dea_res_FG_DDA_wf1<-dea_res_FG_DDA_wf1[which(dea_res_FG_DDA_wf1$contrast==contrast),]
-  return(list(wf=wftop1_FG_DDA, dea_res=dea_res_FG_DDA_wf1))
-}
-
-top1wf_ens<-function(dt, platform, acq, ens_ty, contrast){
-  base_fold<-data_fold
-  if(ens_ty=='ensemble_mv'){
-    dea_res_fold<-paste0(base_fold, acq, '/',platform, '/','mv','/',dt,'/')
-  }else if(ens_ty=='ensemble_topk'){
-    dea_res_fold<-paste0(base_fold, acq, '/',platform, '/','topk','/',dt,'/')
-  }
-  #dea_res_fold<-paste0(base_fold, acq, '/',platform, '/',dt,'/')
-  ranking_all_FG_DDA<-read_excel(paste0(data_fold, 'ranks_all_', platform, '_', acq, '_', ens_ty, '.xlsx'), sheet = 'ranking_all')
-  #ranking_all<-ranking_all[which(ranking_all$runTime!=0 & ranking_all$mean_pauc001!=0 & ranking_all$rank_median_pauc001!=0),]
-  wftop1_FG_DDA<-ranking_all_FG_DDA[which(ranking_all_FG_DDA$avg_rank_mean==min(ranking_all_FG_DDA$avg_rank_mean)),]
-  if(length((wftop1_FG_DDA$workflow))>1){
-    idx=which(wftop1_FG_DDA$avg_rank_median==min(wftop1_FG_DDA$avg_rank_median))
-    wftop1_FG_DDA = wftop1_FG_DDA[idx,]
-  }
-  if(wftop1_FG_DDA$method=='set'){
-    dea_res_FG_DDA_wf1<-read.table(paste0(dea_res_fold,
-                                          dt,'_',
-                                          wftop1_FG_DDA$Platform,'_',
-                                          wftop1_FG_DDA$method, '_',
-                                          wftop1_FG_DDA$operation,
-                                          '_',gsub('top','',gsub('\\|','-',wftop1_FG_DDA$cbn)),'.csv'),
-                                   sep = ',',header = T)
-  }else{
-    if(acq=='TMT'){
-      dea_res_FG_DDA_wf1<-read.table(paste0(dea_res_fold,
-                                            dt,'_',
-                                            wftop1_FG_DDA$Platform,'_',
-                                            wftop1_FG_DDA$method,'_',gsub("top",'',gsub('\\|','-',wftop1_FG_DDA$cbn)),'.csv'),
-                                     sep = ',',header = T)
-    }else{
-      dea_res_FG_DDA_wf1<-read.table(paste0(dea_res_fold,
-                                            dt,'_',
-                                            wftop1_FG_DDA$Platform,'_',
-                                            wftop1_FG_DDA$method,'_',gsub('\\|','-',wftop1_FG_DDA$cbn),'.csv'),
-                                     sep = ',',header = T)
-    }
-
-  }
-  dea_res_FG_DDA_wf1<-dea_res_FG_DDA_wf1[which(dea_res_FG_DDA_wf1$contrast==contrast),]
-  return(list(wf=wftop1_FG_DDA, dea_res=dea_res_FG_DDA_wf1))
-}
-
-dt='HYtims134'
-
-contrast='conditionD-conditionB'
-
-all_protein_FG_DDA<-read.table(paste0(data_fold, 'HYtims134_LFQ_FragPipe_all_proteins.tsv'), sep = '\t', header = T)
-all_protein_MQ_DDA<-read.table(paste0(data_fold, 'HYtims134_LFQ_Maxquant_all_proteins.tsv'), sep = '\t', header = T)
-all_protein_DIANN_DIA<-read.table(paste0(data_fold, 'HYtims134_DIA_DIANN_all_proteins.tsv'), sep = '\t', header = T)
-all_protein_spt_DIA<-read.table(paste0(data_fold, 'HYtims134_DIA_spt_all_proteins.tsv'), sep = '\t', header = T)
-
-top1_FG_DDA<-top1wf('HYtims134_LFQ', 'FragPipe', 'DDA',contrast)
-top1_MQ_DDA<-top1wf('HYtims134_LFQ', 'Maxquant', 'DDA',contrast)
-top1_DIANN_DIA<-top1wf('HYtims134_DIA', 'DIANN', 'DIA',contrast)
-top1_spt_DIA<-top1wf('HYtims134_DIA', 'spt', 'DIA',contrast)
-
-top1_FG_DDA_ens<-top1wf_ens('HYtims134_LFQ', 'FragPipe', 'DDA', 'ensemble_mv',contrast)
-top1_MQ_DDA_ens<-top1wf_ens('HYtims134_LFQ', 'Maxquant', 'DDA', 'ensemble_mv',contrast)
-top1_DIANN_DIA_ens<-top1wf_ens('HYtims134_DIA', 'DIANN', 'DIA', 'ensemble_mv',contrast)
-top1_spt_DIA_ens<-top1wf_ens('HYtims134_DIA', 'spt', 'DIA', 'ensemble_mv',contrast)
-
-FG_DDA<-top1_FG_DDA$dea_res$protein[which(abs(top1_FG_DDA$dea_res$logFC)>=log2(1.5) & top1_FG_DDA$dea_res$adj.pvalue<=0.05)]
-MQ_DDA<-top1_MQ_DDA$dea_res$protein[which(abs(top1_MQ_DDA$dea_res$logFC)>=log2(1.5) & top1_MQ_DDA$dea_res$adj.pvalue<=0.05)]
-DIANN_DIA<-top1_DIANN_DIA$dea_res$protein[which(abs(top1_DIANN_DIA$dea_res$logFC)>=log2(1.5) & top1_DIANN_DIA$dea_res$adj.pvalue<=0.05)]
-spt_DIA<-top1_spt_DIA$dea_res$protein[which(abs(top1_spt_DIA$dea_res$logFC)>=log2(1.5) & top1_spt_DIA$dea_res$adj.pvalue<=0.05)]
-
-FG_DDA_ens<-top1_FG_DDA_ens$dea_res$protein[which(abs(top1_FG_DDA_ens$dea_res$logFC)>=log2(1.5) & top1_FG_DDA_ens$dea_res$adj.pvalue<=0.05)]
-MQ_DDA_ens<-top1_MQ_DDA_ens$dea_res$protein[which(abs(top1_MQ_DDA_ens$dea_res$logFC)>=log2(1.5) & top1_MQ_DDA_ens$dea_res$adj.pvalue<=0.05)]
-DIANN_DIA_ens<-top1_DIANN_DIA_ens$dea_res$protein[which(abs(top1_DIANN_DIA_ens$dea_res$logFC)>=log2(1.5) & top1_DIANN_DIA_ens$dea_res$adj.pvalue<=0.05)]
-spt_DIA_ens<-top1_spt_DIA_ens$dea_res$protein[which(abs(top1_spt_DIA_ens$dea_res$logFC)>=log2(1.5) & top1_spt_DIA_ens$dea_res$adj.pvalue<=0.05)]
-
-
-T_YEAST<-unique(union(union(union(all_protein_FG_DDA$Protein[which(all_protein_FG_DDA$Organism=='YEAST')],
-                                  all_protein_MQ_DDA$Protein[which(all_protein_MQ_DDA$Organism=='YEAST')]),
-                            all_protein_DIANN_DIA$Protein[which(all_protein_DIANN_DIA$Organism=='YEAST')]),
-                      all_protein_spt_DIA$Protein[which(all_protein_spt_DIA$Organism=='YEAST')]))
-# T_ECOLI<-unique(union(union(union(all_protein_FG_DDA$Protein[which(all_protein_FG_DDA$Organism=='ECOLI')],
-#                                   all_protein_MQ_DDA$Protein[which(all_protein_MQ_DDA$Organism=='ECOLI')]),
-#                             all_protein_DIANN_DIA$Protein[which(all_protein_DIANN_DIA$Organism=='ECOLI')]),
-#                       all_protein_spt_DIA$Protein[which(all_protein_spt_DIA$Organism=='ECOLI')]))
-T_HUMAN<-unique(union(union(union(all_protein_FG_DDA$Protein[which(all_protein_FG_DDA$Organism=='HUMAN')],
-                                  all_protein_MQ_DDA$Protein[which(all_protein_MQ_DDA$Organism=='HUMAN')]),
-                            all_protein_DIANN_DIA$Protein[which(all_protein_DIANN_DIA$Organism=='HUMAN')]),
-                      all_protein_spt_DIA$Protein[which(all_protein_spt_DIA$Organism=='HUMAN')]))
-
-DEP_HUMAN<-unique(union(union(union(top1_FG_DDA$dea_res$protein[which(abs(top1_FG_DDA$dea_res$logFC)>=log2(1.5) &
-                                                                        top1_FG_DDA$dea_res$adj.pvalue<=0.05 &
-                                                                        top1_FG_DDA$dea_res$organism=='HUMAN')],
-                                    top1_MQ_DDA$dea_res$protein[which(abs(top1_MQ_DDA$dea_res$logFC)>=log2(1.5) &
-                                                                        top1_MQ_DDA$dea_res$adj.pvalue<=0.05 &
-                                                                        top1_MQ_DDA$dea_res$organism=='HUMAN')]),
-                              top1_DIANN_DIA$dea_res$protein[which(abs(top1_DIANN_DIA$dea_res$logFC)>=log2(1.5) &
-                                                                     top1_DIANN_DIA$dea_res$adj.pvalue<=0.05 &
-                                                                     top1_DIANN_DIA$dea_res$organism=='HUMAN')]),
-                        top1_spt_DIA$dea_res$protein[which(abs(top1_spt_DIA$dea_res$logFC)>=log2(1.5) &
-                                                             top1_spt_DIA$dea_res$adj.pvalue<=0.05 &
-                                                             top1_spt_DIA$dea_res$organism=='HUMAN')]))
-
-
-DEP_HUMAN_ens<-unique(union(union(union(top1_FG_DDA_ens$dea_res$protein[which(abs(top1_FG_DDA_ens$dea_res$logFC)>=log2(1.5) &
-                                                                                top1_FG_DDA_ens$dea_res$adj.pvalue<=0.05 &
-                                                                                top1_FG_DDA_ens$dea_res$organism=='HUMAN')],
-                                        top1_MQ_DDA_ens$dea_res$protein[which(abs(top1_MQ_DDA_ens$dea_res$logFC)>=log2(1.5) &
-                                                                                top1_MQ_DDA_ens$dea_res$adj.pvalue<=0.05 &
-                                                                                top1_MQ_DDA_ens$dea_res$organism=='HUMAN')]),
-                                  top1_DIANN_DIA_ens$dea_res$protein[which(abs(top1_DIANN_DIA_ens$dea_res$logFC)>=log2(1.5) &
-                                                                             top1_DIANN_DIA_ens$dea_res$adj.pvalue<=0.05 &
-                                                                             top1_DIANN_DIA_ens$dea_res$organism=='HUMAN')]),
-                            top1_spt_DIA_ens$dea_res$protein[which(abs(top1_spt_DIA_ens$dea_res$logFC)>=log2(1.5) &
-                                                                     top1_spt_DIA_ens$dea_res$adj.pvalue<=0.05 &
-                                                                     top1_spt_DIA_ens$dea_res$organism=='HUMAN')]))
-
-DEP_HUMAN<-unique(union(DEP_HUMAN, DEP_HUMAN_ens))
-
-DEPs<-data.frame(Proteins=unique(union(union(union(all_protein_FG_DDA$Protein,
-                                                   all_protein_MQ_DDA$Protein),
-                                             all_protein_DIANN_DIA$Protein),
-                                       all_protein_spt_DIA$Protein)))
-DEPs$T_YEAST=c(rep(0, length(DEPs$Proteins)))
-DEPs$T_YEAST[match(T_YEAST, DEPs$Proteins)]=1
-# DEPs$T_ECOLI=c(rep(0, length(DEPs$Proteins)))
-# DEPs$T_ECOLI[match(T_ECOLI, DEPs$Proteins)]=1
-# DEPs$T_HUMAN=c(rep(0, length(DEPs$Proteins)))
-# DEPs$T_HUMAN[match(T_HUMAN, DEPs$Proteins)]=1
-DEPs$DEP_HUMAN=c(rep(0, length(DEPs$Proteins)))
-DEPs$DEP_HUMAN[match(DEP_HUMAN, DEPs$Proteins)]=1
-DEPs$FG_DDA=c(rep(0, length(DEPs$Proteins)))
-DEPs$FG_DDA[match(FG_DDA, DEPs$Proteins)]=1
-DEPs$MQ_DDA=c(rep(0, length(DEPs$Proteins)))
-DEPs$MQ_DDA[match(MQ_DDA, DEPs$Proteins)]=1
-DEPs$DIANN_DIA=c(rep(0, length(DEPs$Proteins)))
-DEPs$DIANN_DIA[match(DIANN_DIA, DEPs$Proteins)]=1
-DEPs$spt_DIA=c(rep(0, length(DEPs$Proteins)))
-DEPs$spt_DIA[match(spt_DIA, DEPs$Proteins)]=1
-
-DEPs$FG_DDA_ens=c(rep(0, length(DEPs$Proteins)))
-DEPs$FG_DDA_ens[match(FG_DDA_ens, DEPs$Proteins)]=1
-DEPs$MQ_DDA_ens=c(rep(0, length(DEPs$Proteins)))
-DEPs$MQ_DDA_ens[match(MQ_DDA_ens, DEPs$Proteins)]=1
-DEPs$DIANN_DIA_ens=c(rep(0, length(DEPs$Proteins)))
-DEPs$DIANN_DIA_ens[match(DIANN_DIA_ens, DEPs$Proteins)]=1
-DEPs$spt_DIA_ens=c(rep(0, length(DEPs$Proteins)))
-DEPs$spt_DIA_ens[match(spt_DIA_ens, DEPs$Proteins)]=1
-
-# simply remove protein groups
-DEPs<-DEPs[setdiff(c(1:length(DEPs$Proteins)),grep(';', DEPs$Proteins)),]
-
-sheet=paste(dt, '_cp_DEPs')
-
-addWorksheet(wb,sheet)
-writeData(wb, sheet, DEPs, startRow = 1, startCol = 1, colNames = TRUE, rowNames = TRUE)
-saveWorkbook(wb, file = paste0(save_fold, 'cross_platform_compare.xlsx'), overwrite = TRUE)
-
-
-# UpSetR::upset(DEPs,
-#               sets = c("T_YEAST", "DEP_HUMAN", "FG_DDA", "MQ_DDA", "DIANN_DIA","spt_DIA","FG_DDA_ens","MQ_DDA_ens", "DIANN_DIA_ens","spt_DIA_ens"),
-#               order.by="freq", matrix.color="black", point.size=3,
-#               sets.bar.color=c("#15d08a","#f2ca01","#a45ee3","#1f11b4","#c3642c",
-#                                "#f078b4", '#5494cc',"gray","pink",'red','orange'),mb.ratio=c(0.5, 0.5), text.scale = 1.5,
-#               number.angles =0)
-
-library(pROC)
-library(ggpubr)
-
-#all_pvals<-read.table('E:/proteomics/manu4_1/codes/reproduce_0_05/temp0_limma_min_FragPipe/HYEtims735_LFQ_top0_maxlfq_mv_outputs.csv',header = T, sep = ',')
-
-cross_platform_proteins<-data.frame(Proteins=DEPs$Proteins, labels=0)
-cross_platform_proteins$labels[grep('YEAST', cross_platform_proteins$Proteins)]=1
-#cross_platform_proteins$labels[grep('ECOLI', cross_platform_proteins$Proteins)]=1
-cross_platform_proteins$qval_FG_DDA<-1
-cross_platform_proteins$logFC_FG_DDA<-0
-com=intersect(cross_platform_proteins$Proteins, top1_FG_DDA$dea_res$protein)
-idx1=match(com, cross_platform_proteins$Proteins)
-idx2=match(com, top1_FG_DDA$dea_res$protein)
-cross_platform_proteins$qval_FG_DDA[idx1]=top1_FG_DDA$dea_res$adj.pvalue[idx2]
-cross_platform_proteins$logFC_FG_DDA[idx1]=top1_FG_DDA$dea_res$logFC[idx2]
-
-cross_platform_proteins$qval_MQ_DDA<-1
-cross_platform_proteins$logFC_MQ_DDA<-0
-com=intersect(cross_platform_proteins$Proteins, top1_MQ_DDA$dea_res$protein)
-idx1=match(com, cross_platform_proteins$Proteins)
-idx2=match(com, top1_MQ_DDA$dea_res$protein)
-cross_platform_proteins$qval_MQ_DDA[idx1]=top1_MQ_DDA$dea_res$adj.pvalue[idx2]
-cross_platform_proteins$logFC_MQ_DDA[idx1]=top1_MQ_DDA$dea_res$logFC[idx2]
-
-cross_platform_proteins$qval_DIANN_DIA<-1
-cross_platform_proteins$logFC_DIANN_DIA<-0
-com=intersect(cross_platform_proteins$Proteins, top1_DIANN_DIA$dea_res$protein)
-idx1=match(com, cross_platform_proteins$Proteins)
-idx2=match(com, top1_DIANN_DIA$dea_res$protein)
-cross_platform_proteins$qval_DIANN_DIA[idx1]=top1_DIANN_DIA$dea_res$adj.pvalue[idx2]
-cross_platform_proteins$logFC_DIANN_DIA[idx1]=top1_DIANN_DIA$dea_res$logFC[idx2]
-
-cross_platform_proteins$qval_spt_DIA<-1
-cross_platform_proteins$logFC_spt_DIA<-0
-com=intersect(cross_platform_proteins$Proteins, top1_spt_DIA$dea_res$protein)
-idx1=match(com, cross_platform_proteins$Proteins)
-idx2=match(com, top1_spt_DIA$dea_res$protein)
-cross_platform_proteins$qval_spt_DIA[idx1]=top1_spt_DIA$dea_res$adj.pvalue[idx2]
-cross_platform_proteins$logFC_spt_DIA[idx1]=top1_spt_DIA$dea_res$logFC[idx2]
-
-cross_platform_proteins$qval_FG_DDA_ens<-1
-cross_platform_proteins$logFC_FG_DDA_ens<-0
-com=intersect(cross_platform_proteins$Proteins, top1_FG_DDA_ens$dea_res$protein)
-idx1=match(com, cross_platform_proteins$Proteins)
-idx2=match(com, top1_FG_DDA_ens$dea_res$protein)
-cross_platform_proteins$qval_FG_DDA_ens[idx1]=top1_FG_DDA_ens$dea_res$adj.pvalue[idx2]
-cross_platform_proteins$logFC_FG_DDA_ens[idx1]=top1_FG_DDA_ens$dea_res$logFC[idx2]
-
-cross_platform_proteins$qval_MQ_DDA_ens<-1
-cross_platform_proteins$logFC_MQ_DDA_ens<-0
-com=intersect(cross_platform_proteins$Proteins, top1_MQ_DDA_ens$dea_res$protein)
-idx1=match(com, cross_platform_proteins$Proteins)
-idx2=match(com, top1_MQ_DDA_ens$dea_res$protein)
-cross_platform_proteins$qval_MQ_DDA_ens[idx1]=top1_MQ_DDA_ens$dea_res$adj.pvalue[idx2]
-cross_platform_proteins$logFC_MQ_DDA_ens[idx1]=top1_MQ_DDA_ens$dea_res$logFC[idx2]
-
-cross_platform_proteins$qval_DIANN_DIA_ens<-1
-cross_platform_proteins$logFC_DIANN_DIA_ens<-0
-com=intersect(cross_platform_proteins$Proteins, top1_DIANN_DIA_ens$dea_res$protein)
-idx1=match(com, cross_platform_proteins$Proteins)
-idx2=match(com, top1_DIANN_DIA_ens$dea_res$protein)
-cross_platform_proteins$qval_DIANN_DIA_ens[idx1]=top1_DIANN_DIA_ens$dea_res$adj.pvalue[idx2]
-cross_platform_proteins$logFC_DIANN_DIA_ens[idx1]=top1_DIANN_DIA_ens$dea_res$logFC[idx2]
-
-cross_platform_proteins$qval_spt_DIA_ens<-1
-cross_platform_proteins$logFC_spt_DIA_ens<-0
-com=intersect(cross_platform_proteins$Proteins, top1_spt_DIA_ens$dea_res$protein)
-idx1=match(com, cross_platform_proteins$Proteins)
-idx2=match(com, top1_spt_DIA_ens$dea_res$protein)
-cross_platform_proteins$qval_spt_DIA_ens[idx1]=top1_spt_DIA_ens$dea_res$adj.pvalue[idx2]
-cross_platform_proteins$logFC_spt_DIA_ens[idx1]=top1_spt_DIA_ens$dea_res$logFC[idx2]
-
-sheet=paste(dt, '_cp_proteins')
-
-addWorksheet(wb,sheet)
-writeData(wb, sheet, cross_platform_proteins, startRow = 1, startCol = 1, colNames = TRUE, rowNames = TRUE)
-saveWorkbook(wb, file = paste0(save_fold, 'cross_platform_compare.xlsx'), overwrite = TRUE)
-
-roc_FG_DDA <- roc(cross_platform_proteins$labels, 1-cross_platform_proteins$qval_FG_DDA)
-roc_MQ_DDA <- roc(cross_platform_proteins$labels, 1-cross_platform_proteins$qval_MQ_DDA)
-roc_DIANN_DIA <- roc(cross_platform_proteins$labels, 1-cross_platform_proteins$qval_DIANN_DIA)
-roc_spt_DIA <- roc(cross_platform_proteins$labels, 1-cross_platform_proteins$qval_spt_DIA)
-
-roc_FG_DDA_ens <- roc(cross_platform_proteins$labels, 1-cross_platform_proteins$qval_FG_DDA_ens)
-roc_MQ_DDA_ens <- roc(cross_platform_proteins$labels, 1-cross_platform_proteins$qval_MQ_DDA_ens)
-roc_DIANN_DIA_ens <- roc(cross_platform_proteins$labels, 1-cross_platform_proteins$qval_DIANN_DIA_ens)
-roc_spt_DIA_ens <- roc(cross_platform_proteins$labels, 1-cross_platform_proteins$qval_spt_DIA_ens)
-
-
-cross_platform_metrics<-function(cross_platform_proteins, setting, roc){
-  lab=cross_platform_proteins$labels
-  if(setting=='FG_DDA'){
-    logFCs=cross_platform_proteins$logFC_FG_DDA
-    qvals=cross_platform_proteins$qval_FG_DDA
-    roc_s<-roc_FG_DDA
-  }else if(setting=='MQ_DDA'){
-    logFCs=cross_platform_proteins$logFC_MQ_DDA
-    qvals=cross_platform_proteins$qval_MQ_DDA
-    roc_s<-roc_MQ_DDA
-  }else if(setting=='DIANN_DIA'){
-    logFCs=cross_platform_proteins$logFC_DIANN_DIA
-    qvals=cross_platform_proteins$qval_DIANN_DIA
-    roc_s<-roc_DIANN_DIA
-  }else if(setting=='spt_DIA'){
-    logFCs=cross_platform_proteins$logFC_spt_DIA
-    qvals=cross_platform_proteins$qval_spt_DIA
-    roc_s<-roc_spt_DIA
-  }else if(setting=='FG_DDA_ens'){
-    logFCs=cross_platform_proteins$logFC_FG_DDA_ens
-    qvals=cross_platform_proteins$qval_FG_DDA_ens
-    roc_s<-roc_FG_DDA_ens
-  }else if(setting=='MQ_DDA_ens'){
-    logFCs=cross_platform_proteins$logFC_MQ_DDA_ens
-    qvals=cross_platform_proteins$qval_MQ_DDA_ens
-    roc_s<-roc_MQ_DDA_ens
-  }else if(setting=='DIANN_DIA_ens'){
-    logFCs=cross_platform_proteins$logFC_DIANN_DIA_ens
-    qvals=cross_platform_proteins$qval_DIANN_DIA_ens
-    roc_s<-roc_DIANN_DIA_ens
-  }else if(setting=='spt_DIA_ens'){
-    logFCs=cross_platform_proteins$logFC_spt_DIA_ens
-    qvals=cross_platform_proteins$qval_spt_DIA_ens
-    roc_s<-roc_spt_DIA_ens
-  }
-  TP=length(which(lab==1 & abs(logFCs)>=log2(1.5) & qvals<=0.05))
-  TN=length(which(lab==0 & (abs(logFCs)<=log2(1.5) | qvals>0.05)))
-  FP=length(which(lab==0 & abs(logFCs)>=log2(1.5) & qvals<=0.05))
-  FN=length(which(lab==1 & (abs(logFCs)<=log2(1.5) | qvals>0.05)))
-
-  Recall = TP/(TP+FN)
-  Precision = TP/(TP+FP)
-  Specificity = TN/(TN+FP)
-  F1=2*Recall*Precision/(Recall+Precision)
-  MCC = (TP*TN-FP*FN)/(((TP+FP)^0.5)*((TP+FN)^0.5)*((TN+FP)^0.5)*((TN+FN))^0.5)
-  Gmean = (Recall*Specificity)^0.5
-  nMCC = (1+MCC)/2
-
-  pauc001=as.numeric(auc(roc_s, partial.auc=c(1, 0.99), partial.auc.correct=TRUE))
-  pauc005=as.numeric(auc(roc_s, partial.auc=c(1, 0.95), partial.auc.correct=TRUE))
-  pauc01=as.numeric(auc(roc_s, partial.auc=c(1, 0.90), partial.auc.correct=TRUE))
-  metrics=data.frame(metric=c('pAUC(0.01)','pAUC(0.05)','pAUC(0.1)','TP', 'TN', 'FP', 'FN', 'Recall', 'Precision', 'Specificity', 'F1', 'MCC', 'G-mean','nMCC'),
-                     value=c(pauc001,pauc005,pauc01,TP, TN, FP, FN, Recall, Precision, Specificity, F1, MCC, Gmean,nMCC))
-  return(metrics)
-}
-
-metrics_FG_DDA=cross_platform_metrics(cross_platform_proteins, 'FG_DDA', roc_FG_DDA)
-metrics_MQ_DDA=cross_platform_metrics(cross_platform_proteins, 'MQ_DDA', roc_MQ_DDA)
-metrics_DIANN_DIA=cross_platform_metrics(cross_platform_proteins, 'DIANN_DIA', roc_DIANN_DIA)
-metrics_spt_DIA=cross_platform_metrics(cross_platform_proteins, 'spt_DIA', roc_spt_DIA)
-
-metrics_FG_DDA_ens=cross_platform_metrics(cross_platform_proteins, 'FG_DDA_ens', roc_FG_DDA_ens)
-metrics_MQ_DDA_ens=cross_platform_metrics(cross_platform_proteins, 'MQ_DDA_ens', roc_MQ_DDA_ens)
-metrics_DIANN_DIA_ens=cross_platform_metrics(cross_platform_proteins, 'DIANN_DIA_ens', roc_DIANN_DIA_ens)
-metrics_spt_DIA_ens=cross_platform_metrics(cross_platform_proteins, 'spt_DIA_ens', roc_spt_DIA_ens)
-
-rdar_dt<-rbind(metrics_FG_DDA$value, metrics_MQ_DDA$value, metrics_DIANN_DIA$value, metrics_spt_DIA$value,
-               metrics_FG_DDA_ens$value, metrics_MQ_DDA_ens$value, metrics_DIANN_DIA_ens$value, metrics_spt_DIA_ens$value)
-colnames(rdar_dt)<-metrics_FG_DDA$metric
-row.names(rdar_dt)<-c('FG_DDA','MQ_DDA', 'DIANN_DIA', 'spt_DIA', 'FG_DDA_ens','MQ_DDA_ens', 'DIANN_DIA_ens', 'spt_DIA_ens')
-rdar_dt<-as.data.frame(as.matrix(rdar_dt))
-pt_rdar_dt<-data.frame(group=row.names(rdar_dt))
-
-sheet=paste(dt, '_cp_metrics')
-
-addWorksheet(wb,sheet)
-writeData(wb, sheet, rdar_dt, startRow = 1, startCol = 1, colNames = TRUE, rowNames = TRUE)
-saveWorkbook(wb, file = paste0(save_fold, 'cross_platform_compare.xlsx'), overwrite = TRUE)
-pt_rdar_dt<-cbind(pt_rdar_dt, rdar_dt[,c(1,2,3,13,14)]) #,4,6
-#pt_rdar_dt$group<-row.names(pt_rdar_dt)
-library(ggradar)
-ggradar(pt_rdar_dt,group.colours=c("#a45ee3","#1f11b4","#f078b4","#f2ca01","gray","pink",'red',"orange"),legend.position = 'right')
-#a=c('#5494cc','#e18283','#0d898a','#f9cc52')
-col=c("#15d08a","#f2ca01","#a45ee3","#1f11b4","#c3642c",
-      "#f078b4", '#5494cc',"gray","pink",'red','orange')
-melt_dt<-melt(pt_rdar_dt)
-colnames(melt_dt)[1]<-'method'
-
-ggdotchart(melt_dt, "variable", "value", group = "method", color = "method",
-           palette = col[c(6,1,8,3,10,7,5,4)],
-
-           add = "segments", #label = "value",
-           add.params = list(color = "lightgray", size = 1),
-           dot.size = 3,
-           #label = 'value',
-           #font.label = list(color = "black", size = 9, vjust = 0.5),
-           position=position_dodge(width = 0.9)
-) +
-  #geom_text(aes(label=value), position = 'indentity')+
-  theme(axis.text.x = element_text(size = 12, angle = 0, hjust = 0.5),
-        axis.title.x = element_blank())#+#+scale_y_continuous(limits = c(0.2, 1))+
-#coord_flip()
-
-
-count_TPs<-data.frame(method=row.names(rdar_dt))
-count_TPs<-cbind(count_TPs, rdar_dt[,c(4:7)]) #,4,6
-melt_dt<-melt(count_TPs)
-melt_dt$label<-as.character(melt_dt$value)
-melt_dt$label[which(melt_dt$variable=='TN' | melt_dt$variable=='FN')]=''
-
-nums<-vector()
-
-
-for (i in 1:length(unique(melt_dt$method))){
-  num_i<-melt_dt[which(melt_dt$method==melt_dt$method[i]),]
-  uni_var<-levels(factor(melt_dt$variable))
-  re_order<-match(num_i$variable, uni_var)
-  num_i<-num_i[re_order,]
-  l_y<-c(rep(0,length(uni_var)))
-  for (j in length(uni_var):1) {
-    if(j==length(uni_var)){
-      l_y[j]=num_i$value[j]/2
-    }else{
-      l_y_j=num_i$value[j]/2 + sum(num_i$value[c((j+1):length(uni_var))])
-      l_y[j]=l_y_j
-    }
-  }
-  num_i$l_y<-l_y
-  nums<-rbind(nums,num_i)
-}
-## supp. Fig. 6
-ggbarplot(nums, "method", "value", group = "variable", color = "variable",
-          fill="variable", #label = T,lab.pos='in',
-          platette = c('#5494cc','#e18283','#0d898a','#f9cc52'),
-) + geom_text(aes(y=l_y, label=label))+
-  scale_x_discrete(limits=c('FG_DDA_ens','MQ_DDA_ens','DIANN_DIA_ens', 'spt_DIA_ens',
-                            'FG_DDA','MQ_DDA','DIANN_DIA','spt_DIA')) +
-  geom_vline(xintercept = 4.5, linetype=2, show.legend=FALSE) + theme(axis.line.y = element_blank())+
-  coord_flip()+theme(axis.title.y = element_blank())
 
 ############
 ## cross instrument
@@ -2200,19 +1361,24 @@ library(ggpubr)
 library(cowplot)
 
 library(openxlsx)
-wb <- createWorkbook()
+wb9 <- createWorkbook()
 
 top1wf<-function(dt, platform, acq){
   base_fold<-data_fold
   dea_res_fold<-paste0(base_fold, acq, '/',platform, '/',dt,'/')
   ranking_all_FG_DDA<-read_excel(paste0(data_fold, 'ranks_all_', platform, '_', acq, '.xlsx'), sheet = 'ranking_all')
-
-  #ranking_all<-ranking_all[which(ranking_all$runTime!=0 & ranking_all$mean_pauc001!=0 & ranking_all$rank_median_pauc001!=0),]
+  
+  
   wftop1_FG_DDA<-ranking_all_FG_DDA[which(ranking_all_FG_DDA$avg_rank_mean==min(ranking_all_FG_DDA$avg_rank_mean)),]
   if(length((wftop1_FG_DDA$workflow))>1){
     idx=which(wftop1_FG_DDA$avg_rank_median==min(wftop1_FG_DDA$avg_rank_median))
     wftop1_FG_DDA = wftop1_FG_DDA[idx,]
   }
+  print(paste0(dea_res_fold,
+               dt,'_',wftop1_FG_DDA$DEA,'_',
+               wftop1_FG_DDA$Platform,'_',
+               wftop1_FG_DDA$Matrix,'_',gsub('blank','',wftop1_FG_DDA$Imput),
+               '_',gsub('blank','',wftop1_FG_DDA$normalization),'.csv'))
   dea_res_FG_DDA_wf1<-read.table(paste0(dea_res_fold,
                                         dt,'_',wftop1_FG_DDA$DEA,'_',
                                         wftop1_FG_DDA$Platform,'_',
@@ -2229,9 +1395,9 @@ top1wf_ens<-function(dt, platform, acq, ens_ty){
   }else if(ens_ty=='ensemble_topk'){
     dea_res_fold<-paste0(base_fold, acq, '/',platform, '/','topk','/',dt,'/')
   }
-  #dea_res_fold<-paste0(base_fold, acq, '/',platform, '/',dt,'/')
+  
   ranking_all_FG_DDA<-read_excel(paste0(data_fold, 'ranks_all_', platform, '_', acq, '_', ens_ty, '.xlsx'), sheet = 'ranking_all')
-  #ranking_all<-ranking_all[which(ranking_all$runTime!=0 & ranking_all$mean_pauc001!=0 & ranking_all$rank_median_pauc001!=0),]
+  
   wftop1_FG_DDA<-ranking_all_FG_DDA[which(ranking_all_FG_DDA$avg_rank_mean==min(ranking_all_FG_DDA$avg_rank_mean)),]
   if(length((wftop1_FG_DDA$workflow))>1){
     idx=which(wftop1_FG_DDA$avg_rank_median==min(wftop1_FG_DDA$avg_rank_median))
@@ -2252,7 +1418,7 @@ top1wf_ens<-function(dt, platform, acq, ens_ty){
                                           wftop1_FG_DDA$method,'_',gsub('\\|','-',wftop1_FG_DDA$cbn),'.csv'),
                                    sep = ',',header = T)
   }
-
+  
   return(list(wf=wftop1_FG_DDA, dea_res=dea_res_FG_DDA_wf1))
 }
 
@@ -2268,7 +1434,6 @@ all_protein_FG_DDA_st6600<-read.table(paste0(data_fold,'HYE6600735_LFQ_FragPipe_
 all_protein_MQ_DDA_st6600<-read.table(paste0(data_fold,'HYE6600735_LFQ_Maxquant_all_proteins.tsv'), sep = '\t', header = T)
 all_protein_FG_DDA_qe<-read.table(paste0(data_fold,'HYEqe735_LFQ_FragPipe_all_proteins.tsv'), sep = '\t', header = T)
 all_protein_MQ_DDA_qe<-read.table(paste0(data_fold,'HYEqe735_LFQ_Maxquant_all_proteins.tsv'), sep = '\t', header = T)
-
 
 
 top1_FG_DDA_tims<-top1wf('HYEtims735_LFQ', 'FragPipe', 'DDA')
@@ -2322,29 +1487,29 @@ MQ_DDA_qe_ens<-top1_MQ_DDA_qe_ens$dea_res$protein[which(abs(top1_MQ_DDA_qe_ens$d
 
 T_YEAST<-unique(union(union(union(union(union(union(union(union(union(
   all_protein_FG_DDA_tims$Protein[which(all_protein_FG_DDA_tims$Organism=='YEAST')],
-                                  all_protein_MQ_DDA_tims$Protein[which(all_protein_MQ_DDA_tims$Organism=='YEAST')]),
-                            all_protein_DIANN_DIA_tims$Protein[which(all_protein_DIANN_DIA_tims$Organism=='YEAST')]),
-                      all_protein_spt_DIA_tims$Protein[which(all_protein_spt_DIA_tims$Organism=='YEAST')]),
-                      all_protein_FG_DDA_st5600$Protein[which(all_protein_FG_DDA_st5600$Organism=='YEAST')]),
-                      all_protein_FG_DDA_st6600$Protein[which(all_protein_FG_DDA_st6600$Organism=='YEAST')]),
-                      all_protein_FG_DDA_qe$Protein[which(all_protein_FG_DDA_qe$Organism=='YEAST')]),
-                all_protein_MQ_DDA_st5600$Protein[which(all_protein_MQ_DDA_st5600$Organism=='YEAST')]),
-                all_protein_MQ_DDA_st6600$Protein[which(all_protein_MQ_DDA_st6600$Organism=='YEAST')]),
-                all_protein_MQ_DDA_qe$Protein[which(all_protein_MQ_DDA_qe$Organism=='YEAST')]))
+  all_protein_MQ_DDA_tims$Protein[which(all_protein_MQ_DDA_tims$Organism=='YEAST')]),
+  all_protein_DIANN_DIA_tims$Protein[which(all_protein_DIANN_DIA_tims$Organism=='YEAST')]),
+  all_protein_spt_DIA_tims$Protein[which(all_protein_spt_DIA_tims$Organism=='YEAST')]),
+  all_protein_FG_DDA_st5600$Protein[which(all_protein_FG_DDA_st5600$Organism=='YEAST')]),
+  all_protein_FG_DDA_st6600$Protein[which(all_protein_FG_DDA_st6600$Organism=='YEAST')]),
+  all_protein_FG_DDA_qe$Protein[which(all_protein_FG_DDA_qe$Organism=='YEAST')]),
+  all_protein_MQ_DDA_st5600$Protein[which(all_protein_MQ_DDA_st5600$Organism=='YEAST')]),
+  all_protein_MQ_DDA_st6600$Protein[which(all_protein_MQ_DDA_st6600$Organism=='YEAST')]),
+  all_protein_MQ_DDA_qe$Protein[which(all_protein_MQ_DDA_qe$Organism=='YEAST')]))
 
 
 
 T_ECOLI<-unique(union(union(union(union(union(union(union(union(union(
   all_protein_FG_DDA_tims$Protein[which(all_protein_FG_DDA_tims$Organism=='ECOLI')],
-                                  all_protein_MQ_DDA_tims$Protein[which(all_protein_MQ_DDA_tims$Organism=='ECOLI')]),
-                            all_protein_DIANN_DIA_tims$Protein[which(all_protein_DIANN_DIA_tims$Organism=='ECOLI')]),
-                      all_protein_spt_DIA_tims$Protein[which(all_protein_spt_DIA_tims$Organism=='ECOLI')]),
-                all_protein_FG_DDA_st5600$Protein[which(all_protein_FG_DDA_st5600$Organism=='ECOLI')]),
-all_protein_FG_DDA_st6600$Protein[which(all_protein_FG_DDA_st6600$Organism=='ECOLI')]),
-all_protein_FG_DDA_qe$Protein[which(all_protein_FG_DDA_qe$Organism=='ECOLI')]),
-all_protein_MQ_DDA_st5600$Protein[which(all_protein_MQ_DDA_st5600$Organism=='ECOLI')]),
-all_protein_MQ_DDA_st6600$Protein[which(all_protein_MQ_DDA_st6600$Organism=='ECOLI')]),
-all_protein_MQ_DDA_qe$Protein[which(all_protein_MQ_DDA_qe$Organism=='ECOLI')]))
+  all_protein_MQ_DDA_tims$Protein[which(all_protein_MQ_DDA_tims$Organism=='ECOLI')]),
+  all_protein_DIANN_DIA_tims$Protein[which(all_protein_DIANN_DIA_tims$Organism=='ECOLI')]),
+  all_protein_spt_DIA_tims$Protein[which(all_protein_spt_DIA_tims$Organism=='ECOLI')]),
+  all_protein_FG_DDA_st5600$Protein[which(all_protein_FG_DDA_st5600$Organism=='ECOLI')]),
+  all_protein_FG_DDA_st6600$Protein[which(all_protein_FG_DDA_st6600$Organism=='ECOLI')]),
+  all_protein_FG_DDA_qe$Protein[which(all_protein_FG_DDA_qe$Organism=='ECOLI')]),
+  all_protein_MQ_DDA_st5600$Protein[which(all_protein_MQ_DDA_st5600$Organism=='ECOLI')]),
+  all_protein_MQ_DDA_st6600$Protein[which(all_protein_MQ_DDA_st6600$Organism=='ECOLI')]),
+  all_protein_MQ_DDA_qe$Protein[which(all_protein_MQ_DDA_qe$Organism=='ECOLI')]))
 
 T_HUMAN<-unique(union(union(union(union(union(union(union(union(union(
   all_protein_FG_DDA_tims$Protein[which(all_protein_FG_DDA_tims$Organism=='HUMAN')],
@@ -2360,11 +1525,11 @@ T_HUMAN<-unique(union(union(union(union(union(union(union(union(union(
 
 DEPs<-data.frame(Proteins=unique(union(union(union(union(union(union(union(union(union(
   all_protein_FG_DDA_tims$Protein, all_protein_MQ_DDA_tims$Protein),
-                                             all_protein_DIANN_DIA_tims$Protein),
-                                       all_protein_spt_DIA_tims$Protein),
-                                 all_protein_FG_DDA_st5600$Protein),
-                 all_protein_FG_DDA_st6600$Protein),
-                 all_protein_FG_DDA_qe$Protein),
+  all_protein_DIANN_DIA_tims$Protein),
+  all_protein_spt_DIA_tims$Protein),
+  all_protein_FG_DDA_st5600$Protein),
+  all_protein_FG_DDA_st6600$Protein),
+  all_protein_FG_DDA_qe$Protein),
   all_protein_MQ_DDA_st5600$Protein),
   all_protein_MQ_DDA_st6600$Protein),
   all_protein_MQ_DDA_qe$Protein)))
@@ -2381,15 +1546,12 @@ DEPs<-DEPs[setdiff(c(1:length(DEPs$Proteins)),grep(';', DEPs$Proteins)),]
 
 sheet=paste(dt, '_ci_DEPs')
 
-addWorksheet(wb,sheet)
-writeData(wb, sheet, DEPs, startRow = 1, startCol = 1, colNames = TRUE, rowNames = TRUE)
-saveWorkbook(wb, file = paste0(save_fold, 'cross_instrument_compare.xlsx'), overwrite = TRUE)
+addWorksheet(wb9,sheet)
+writeData(wb9, sheet, DEPs, startRow = 1, startCol = 1, colNames = TRUE, rowNames = TRUE)
 
 
 library(pROC)
 library(ggpubr)
-
-#all_pvals<-read.table('E:/proteomics/manu4_1/codes/reproduce_0_05/temp0_limma_min_FragPipe/HYEtims735_LFQ_top0_maxlfq_mv_outputs.csv',header = T, sep = ',')
 
 cross_platform_proteins<-data.frame(Proteins=DEPs$Proteins, labels=0)
 cross_platform_proteins$labels[grep('YEAST', cross_platform_proteins$Proteins)]=1
@@ -2556,9 +1718,8 @@ cross_platform_proteins$qval_MQ_DDA_qe_ens[idx1]=top1_MQ_DDA_qe_ens$dea_res$adj.
 cross_platform_proteins$logFC_MQ_DDA_qe_ens[idx1]=top1_MQ_DDA_qe_ens$dea_res$logFC[idx2]
 sheet=paste(dt, '_ci_proteins')
 
-addWorksheet(wb,sheet)
-writeData(wb, sheet, cross_platform_proteins, startRow = 1, startCol = 1, colNames = TRUE, rowNames = TRUE)
-saveWorkbook(wb, file = paste0(save_fold, 'cross_instrument_compare.xlsx'), overwrite = TRUE)
+addWorksheet(wb9,sheet)
+writeData(wb9, sheet, cross_platform_proteins, startRow = 1, startCol = 1, colNames = TRUE, rowNames = TRUE)
 
 roc_FG_DDA_tims <- roc(cross_platform_proteins$labels, 1-cross_platform_proteins$qval_FG_DDA_tims)
 roc_MQ_DDA_tims <- roc(cross_platform_proteins$labels, 1-cross_platform_proteins$qval_MQ_DDA_tims)
@@ -2583,6 +1744,7 @@ roc_FG_DDA_st6600_ens <- roc(cross_platform_proteins$labels, 1-cross_platform_pr
 roc_MQ_DDA_st6600_ens <- roc(cross_platform_proteins$labels, 1-cross_platform_proteins$qval_MQ_DDA_st6600_ens)
 roc_FG_DDA_qe_ens <- roc(cross_platform_proteins$labels, 1-cross_platform_proteins$qval_FG_DDA_qe_ens)
 roc_MQ_DDA_qe_ens <- roc(cross_platform_proteins$labels, 1-cross_platform_proteins$qval_MQ_DDA_qe_ens)
+
 
 cross_platform_metrics<-function(cross_platform_proteins, setting, roc){
   lab=cross_platform_proteins$labels
@@ -2671,7 +1833,7 @@ cross_platform_metrics<-function(cross_platform_proteins, setting, roc){
   TN=length(which(lab==0 & (abs(logFCs)<=log2(1.5) | qvals>0.05)))
   FP=length(which(lab==0 & abs(logFCs)>=log2(1.5) & qvals<=0.05))
   FN=length(which(lab==1 & (abs(logFCs)<=log2(1.5) | qvals>0.05)))
-
+  
   Recall = TP/(TP+FN)
   Precision = TP/(TP+FP)
   Specificity = TN/(TN+FP)
@@ -2679,7 +1841,7 @@ cross_platform_metrics<-function(cross_platform_proteins, setting, roc){
   MCC = (TP*TN-FP*FN)/(((TP+FP)^0.5)*((TP+FN)^0.5)*((TN+FP)^0.5)*((TN+FN))^0.5)
   Gmean = (Recall*Specificity)^0.5
   nMCC = (1+MCC)/2
-
+  
   pauc001=as.numeric(auc(roc_s, partial.auc=c(1, 0.99), partial.auc.correct=TRUE))
   pauc005=as.numeric(auc(roc_s, partial.auc=c(1, 0.95), partial.auc.correct=TRUE))
   pauc01=as.numeric(auc(roc_s, partial.auc=c(1, 0.90), partial.auc.correct=TRUE))
@@ -2718,7 +1880,7 @@ rdar_dt<-rbind(metrics_FG_DDA_tims$value, metrics_MQ_DDA_tims$value, metrics_DIA
                metrics_FG_DDA_st5600$value, metrics_MQ_DDA_st5600$value, metrics_FG_DDA_st5600_ens$value, metrics_MQ_DDA_st5600_ens$value,
                metrics_FG_DDA_st6600$value, metrics_MQ_DDA_st6600$value, metrics_FG_DDA_st6600_ens$value, metrics_MQ_DDA_st6600_ens$value,
                metrics_FG_DDA_qe$value, metrics_MQ_DDA_qe$value, metrics_FG_DDA_qe_ens$value, metrics_MQ_DDA_qe_ens$value
-               )
+)
 colnames(rdar_dt)<-metrics_FG_DDA_tims$metric
 row.names(rdar_dt)<-c('FG_DDA_tims','MQ_DDA_tims', 'DIANN_DIA_tims', 'spt_DIA_tims', 'FG_DDA_tims_ens',
                       'MQ_DDA_tims_ens', 'DIANN_DIA_tims_ens', 'spt_DIA_tims_ens',
@@ -2730,28 +1892,19 @@ pt_rdar_dt<-data.frame(group=row.names(rdar_dt))
 
 sheet=paste(dt, '_cp_metrics')
 
-addWorksheet(wb,sheet)
-writeData(wb, sheet, rdar_dt, startRow = 1, startCol = 1, colNames = TRUE, rowNames = TRUE)
-saveWorkbook(wb, file = paste0(save_fold, 'cross_instrument_compare.xlsx'), overwrite = TRUE)
+addWorksheet(wb9,sheet)
+writeData(wb9, sheet, rdar_dt, startRow = 1, startCol = 1, colNames = TRUE, rowNames = TRUE)
+saveWorkbook(wb9, file = paste0(save_fold, 'cross_instrument_compare.xlsx'), overwrite = TRUE)
 pt_rdar_dt<-cbind(pt_rdar_dt, rdar_dt[,c(1,2,3,13,14)]) #,4,6
-#pt_rdar_dt$group<-row.names(pt_rdar_dt)
+
 library(ggradar)
-#ggradar(pt_rdar_dt,group.colours=c("#a45ee3","#1f11b4","#f078b4","#f2ca01","gray","pink",'red',"orange"),legend.position = 'right')
-#a=c('#5494cc','#e18283','#0d898a','#f9cc52')
+
 col=c("#15d08a","#f2ca01","#a45ee3","#1f11b4","#c3642c",
       "#f078b4", '#5494cc',"gray","pink",'red','orange',"#21708a","#13ca01","#a45673","#a232b4","#d4a42c",
       "#0a48b4", '#c1256c',"black","#ccffc1",'#ddcd11','#342456')
 melt_dt<-melt(pt_rdar_dt)
 colnames(melt_dt)[1]<-'method'
-# p3=ggplot(melt_dt, aes(x = variable, y = value, colour = method)) +
-#   geom_bar(aes(fill = method),position=position_dodge(width = 0.5), stat = "identity", width = 0.1) +
-#   geom_point(position=position_dodge(width = 0.1),size=3, shape=19) +
-#   scale_fill_manual(values=col[])
-#   mytheme = theme_classic() + theme(axis.text.x = element_text(size = 16, angle = -20),axis.text.y = element_text(size = 16))+
-#   theme(axis.title.y= element_text(size=16))+theme(axis.title.x = element_text(size = 16))+
-#   theme(legend.title=element_text(size=16),legend.text=element_text(size=16), legend.position = "top")
-#   p3=p3+mytheme
-#   p3
+
 
 ggdotchart(melt_dt, "variable", "value", group = "method", color = "method",
            palette = col,
@@ -2789,18 +1942,19 @@ for (i in 1:length(unique(melt_dt$method))){
   nums<-rbind(nums,num_i)
 }
 
-## Figure 5D
+#library(ggrepel)
 ggbarplot(nums, "method", "value", group = "variable", color = "variable",fill="variable",
           platette = c('#5494cc','#e18283','#0d898a','#f9cc52') #label=as.character(melt_dt$value)),
 ) +geom_vline(xintercept = 10.5, linetype=2, show.legend=FALSE)+ scale_x_discrete(limits=c('FG_DDA_st5600_ens', 'MQ_DDA_st5600_ens',
-                              'FG_DDA_st6600_ens','MQ_DDA_st6600_ens',
-                              'FG_DDA_qe_ens','MQ_DDA_qe_ens',
-                              'FG_DDA_tims_ens','MQ_DDA_tims_ens',
-                              'DIANN_DIA_tims_ens', 'spt_DIA_tims_ens',
-                              'FG_DDA_st5600', 'MQ_DDA_st5600', 'FG_DDA_st6600', 'MQ_DDA_st6600',
-                              'FG_DDA_qe','MQ_DDA_qe','FG_DDA_tims','MQ_DDA_tims',
-                              'DIANN_DIA_tims','spt_DIA_tims'
-                              )) + geom_text(aes(y=l_y, label=label)) +
-theme(axis.title.y = element_blank())+ theme(axis.line.y = element_blank())+ coord_flip()
+                                                                                           'FG_DDA_st6600_ens','MQ_DDA_st6600_ens',
+                                                                                           'FG_DDA_qe_ens','MQ_DDA_qe_ens',
+                                                                                           'FG_DDA_tims_ens','MQ_DDA_tims_ens',
+                                                                                           'DIANN_DIA_tims_ens', 'spt_DIA_tims_ens',
+                                                                                           'FG_DDA_st5600', 'MQ_DDA_st5600', 'FG_DDA_st6600', 'MQ_DDA_st6600',
+                                                                                           'FG_DDA_qe','MQ_DDA_qe','FG_DDA_tims','MQ_DDA_tims',
+                                                                                           'DIANN_DIA_tims','spt_DIA_tims'
+)) + geom_text(aes(y=l_y, label=label)) +
+  theme(axis.title.y = element_blank())+ theme(axis.line.y = element_blank())+ coord_flip()
 
 write.table(nums, paste0(save_fold, 'Figure5D.csv'), col.names = T, row.names = F)
+

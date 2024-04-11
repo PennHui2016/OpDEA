@@ -1,0 +1,10 @@
+0.5625,frozenset({'No_norm'})
+0.375,frozenset({'proDA'})
+0.175,frozenset({'DEP'})
+0.375,frozenset({'limma'})
+0.3625,frozenset({'lossf'})
+0.2,"frozenset({'proDA', 'No_norm'})"
+0.175,"frozenset({'DEP', 'No_norm'})"
+0.1875,"frozenset({'No_norm', 'limma'})"
+0.1875,"frozenset({'lossf', 'limma'})"
+0.175,"frozenset({'proDA', 'lossf'})"

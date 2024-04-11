@@ -1,0 +1,17 @@
+0.6476190476190476,frozenset({'ROTS'})
+0.43492063492063493,frozenset({'No_norm'})
+0.4158730158730159,frozenset({'dlfq'})
+0.48253968253968255,frozenset({'LFQ'})
+0.1523809523809524,frozenset({'limma'})
+0.10793650793650794,frozenset({'center.mean'})
+0.10476190476190476,frozenset({'center.median'})
+0.1111111111111111,frozenset({'Rlr'})
+0.10158730158730159,frozenset({'DEP'})
+0.11746031746031746,frozenset({'lossf'})
+0.14285714285714285,"frozenset({'ROTS', 'No_norm'})"
+0.19365079365079366,"frozenset({'LFQ', 'No_norm'})"
+0.28888888888888886,"frozenset({'dlfq', 'ROTS'})"
+0.17777777777777778,"frozenset({'dlfq', 'No_norm'})"
+0.28888888888888886,"frozenset({'LFQ', 'ROTS'})"
+0.11428571428571428,"frozenset({'limma', 'No_norm'})"
+0.10158730158730159,"frozenset({'center.mean', 'ROTS'})"

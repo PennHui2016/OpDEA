@@ -303,6 +303,7 @@ get_expression_matrix_diann_dia<-function(raw, evid, design, exp, python_path){
   dir.create(temp_res_dir)
   designs<-read.table(design, header = T, sep = '\t')
   if(exp=='dlfq'){
+    #browser()
     dlfq_path<-run_dlfq(raw, evid, platform, python_path)
     dlfq_table<-read.table(dlfq_path, header = T, sep = '\t', quote = "")
     colnames(dlfq_table)<-gsub('X', '', colnames(dlfq_table))

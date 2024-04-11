@@ -1,4 +1,15 @@
-"FG_DDA" "MQ_DDA"
-"plgem" 1 1
-"edgeR" 2 2
-"beta_binomial" 3 3
+"FG_DDA" "MQ_DDA" "MQ_TMT" "FG_TMT" "DIANN_DIA" "spt_DIA" "average"
+"none" 1 4 1 1 1 1 1
+"max" 5 8 4 4 4 6 5
+"center.median" 2 3 5 2 5 5 3
+"lossf" 3 1 2 3 5 3 2
+"div.median" 7 6 13 14 11 9 10
+"Rlr" 4 2 3 6 7 4 4
+"center.mean" 5 5 6 5 3 7 5
+"div.mean" 9 11 12 13 9 10 11
+"vsn" 10 9 8 9 10 13 9
+"sum" 12 14 7 6 8 8 8
+"quantiles" 8 6 9 8 2 2 7
+"MBQN" 10 10 14 11 13 14 14
+"TIC" 13 11 10 12 12 10 11
+"quantiles.robust" 14 13 11 10 14 12 13

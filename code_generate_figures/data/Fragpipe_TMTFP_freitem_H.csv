@@ -1,0 +1,26 @@
+0.538135593220339,frozenset({'No_norm'})
+0.4279661016949153,frozenset({'limma'})
+0.3644067796610169,frozenset({'abd'})
+0.2796610169491525,frozenset({'ratio'})
+0.13983050847457626,frozenset({'center.median'})
+0.2711864406779661,frozenset({'proDA'})
+0.3305084745762712,frozenset({'phi'})
+0.2033898305084746,frozenset({'ROTS'})
+0.2711864406779661,frozenset({'lossf'})
+0.19915254237288135,"frozenset({'limma', 'No_norm'})"
+0.2033898305084746,"frozenset({'abd', 'No_norm'})"
+0.16101694915254236,"frozenset({'limma', 'abd'})"
+0.13983050847457626,"frozenset({'ratio', 'No_norm'})"
+0.13559322033898305,"frozenset({'limma', 'ratio'})"
+0.13983050847457626,"frozenset({'center.median', 'ratio'})"
+0.13559322033898305,"frozenset({'proDA', 'abd'})"
+0.13559322033898305,"frozenset({'proDA', 'No_norm'})"
+0.13559322033898305,"frozenset({'phi', 'proDA'})"
+0.19491525423728814,"frozenset({'phi', 'No_norm'})"
+0.13135593220338984,"frozenset({'phi', 'limma'})"
+0.13559322033898305,"frozenset({'ROTS', 'No_norm'})"
+0.13559322033898305,"frozenset({'ratio', 'ROTS'})"
+0.13559322033898305,"frozenset({'lossf', 'abd'})"
+0.13559322033898305,"frozenset({'limma', 'lossf'})"
+0.13559322033898305,"frozenset({'proDA', 'lossf'})"
+0.13559322033898305,"frozenset({'phi', 'lossf'})"

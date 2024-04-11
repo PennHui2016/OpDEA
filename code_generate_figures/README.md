@@ -1,13 +1,18 @@
+## Reproduce the figures in our paper
 The Figures in main text can be reproduced with the R scripts of Figure2.R, Figure3, Figure4.R and Figure5.R respectively.
+The supp.Fig in Supplementary Information file can be reproduced with the R script Supp.Figures.R.
 
+## Workflow performance level classification 
 To reproduce the workflow performance level classification, the following python packages are required to be installed (package version are behind package names):
 
    pandas-v2.0.3, numpy-v1.24.3, sklearn-v1.3.0, fpgrowth_py-v1.0.0, mlxtend-v0.23.0, catboost-v1.2.2
    
    then, run the codes with the following command with python(python 3.11 was used by the author), :
-     
+
+	  ```
 	  python Catboost_workflows_classification.py
 	  python Catboost_workflows_classification_TMT_mq.py
+          ```
 
 To reproduce the figures, the following R packages (version numbers are behined package names) are required to be installed:
    

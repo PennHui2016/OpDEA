@@ -29,7 +29,7 @@ app_ui <- function(request) {
     dashboardBody(
       tabItems(
         tabItem("front",
-                h3("OpDEA: Achieving Superior Differential Analysis in Proteomics Workflows via Ensemble Inference Optimization"),
+                h3("OpDEA: Optimizing Differential Expression Analysis for Proteomics Data via High-Performing Rules and Ensemble Inference"),
                 br(),
                 tabIntro,
                 tabWf_intro,

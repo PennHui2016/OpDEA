@@ -1,8 +1,10 @@
 res_root<-'benchmark_res/'
 
-rank_metrics<-function(metrics){
-  metrics$mean<-apply(metrics, 1, function(x) mean(as.numeric(x[c(7:length(x))])))
-  metrics$median<-apply(metrics, 1, function(x) median(as.numeric(x[c(7:length(x))])))
+rank_metrics<-function(metrics, st){
+  means<-apply(metrics, 1, function(x) mean(as.numeric(x[c(st:length(x))])))
+  medians<-apply(metrics, 1, function(x) median(as.numeric(x[c(st:length(x))])))
+  metrics$mean<-means
+  metrics$median<-medians
   metrics$rank_mean[order(-as.numeric(metrics$mean))]<-c(1:length(metrics$mean))
   metrics$rank_median[order(-as.numeric(metrics$median))]<-c(1:length(metrics$median))
   metrics$workflow<-paste0(metrics$DEA,'|',metrics$Platform,'|',metrics$Matrix,'|',metrics$Imput,'|',metrics$normalization)
@@ -139,13 +141,13 @@ for (platform in c('FragPipe', 'Maxquant')) {
   nMCCs005<-as.data.frame(cbind(res_cls001[,c(1:5)], nMCCs005))
   Gmeans005<-as.data.frame(cbind(res_cls001[,c(1:5)], Gmeans005))
   
-  pAUC001s<-rank_metrics(pAUC001s)
-  pAUC005s<-rank_metrics(pAUC005s)
-  pAUC01s<-rank_metrics(pAUC01s)
-  nMCCs001<-rank_metrics(nMCCs001)
-  Gmeans001<-rank_metrics(Gmeans001)
-  nMCCs005<-rank_metrics(nMCCs005)
-  Gmeans005<-rank_metrics(Gmeans005)
+  pAUC001s<-rank_metrics(pAUC001s, 6)
+  pAUC005s<-rank_metrics(pAUC005s, 6)
+  pAUC01s<-rank_metrics(pAUC01s, 6)
+  nMCCs001<-rank_metrics(nMCCs001, 6)
+  Gmeans001<-rank_metrics(Gmeans001, 6)
+  nMCCs005<-rank_metrics(nMCCs005, 6)
+  Gmeans005<-rank_metrics(Gmeans005, 6)
   
   ranks_all<-cbind(pAUC001s$rank, pAUC005s$rank, pAUC01s$rank, nMCCs005$rank, Gmeans005$rank)
   colnames(ranks_all)<-c('mean_pauc001', 'median_pauc001', 'rank_mean_pauc001', 'rank_median_pauc001',
@@ -156,12 +158,12 @@ for (platform in c('FragPipe', 'Maxquant')) {
   ranks_all<-as.data.frame(ranks_all)
   ranks_all$avg_rank_mean<-rowMeans(cbind(ranks_all$rank_mean_pauc001,
                                           ranks_all$rank_mean_pauc005,
-                                          #ranks_all$rank_mean_pauc01,
+                                          ranks_all$rank_mean_pauc01,
                                           ranks_all$rank_mean_nmcc005,
                                           ranks_all$rank_mean_gmean005))
   ranks_all$avg_rank_median<-rowMeans(cbind(ranks_all$rank_median_pauc001,
                                           ranks_all$rank_median_pauc005,
-                                          #ranks_all$rank_median_pauc01,
+                                          ranks_all$rank_median_pauc01,
                                           ranks_all$rank_median_nmcc005,
                                           ranks_all$rank_median_gmean005))
   

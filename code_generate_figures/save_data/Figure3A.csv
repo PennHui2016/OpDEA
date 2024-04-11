@@ -1,13 +1,121 @@
-"setting" "metrics" "value" "sd"
-"MQ_TMT" "F1" 0.94 0.02
-"MQ_TMT" "Mcc" 0.92 0.02
-"FG_TMT" "F1" 0.96 0.01
-"FG_TMT" "Mcc" 0.94 0.01
-"FG_DDA" "F1" 0.87 0.01
-"FG_DDA" "Mcc" 0.84 0.02
-"MQ_DDA" "F1" 0.88 0.02
-"MQ_DDA" "Mcc" 0.86 0.02
-"DIANN_DIA" "F1" 0.89 0.01
-"DIANN_DIA" "Mcc" 0.86 0.01
-"spt_DIA" "F1" 0.92 0.02
-"spt_DIA" "Mcc" 0.89 0.02
+"setting" "metric" "value"
+"MQ_TMT" "F1" 0.93
+"MQ_TMT" "F1" 0.94
+"MQ_TMT" "F1" 0.92
+"MQ_TMT" "F1" 0.95
+"MQ_TMT" "F1" 0.93
+"MQ_TMT" "F1" 0.97
+"MQ_TMT" "F1" 0.91
+"MQ_TMT" "F1" 0.95
+"MQ_TMT" "F1" 0.91
+"MQ_TMT" "F1" 0.96
+"MQ_TMT" "Mcc" 0.9
+"MQ_TMT" "Mcc" 0.89
+"MQ_TMT" "Mcc" 0.9
+"MQ_TMT" "Mcc" 0.92
+"MQ_TMT" "Mcc" 0.94
+"MQ_TMT" "Mcc" 0.95
+"MQ_TMT" "Mcc" 0.89
+"MQ_TMT" "Mcc" 0.93
+"MQ_TMT" "Mcc" 0.91
+"MQ_TMT" "Mcc" 0.95
+"FG_TMT" "F1" 0.97
+"FG_TMT" "F1" 0.95
+"FG_TMT" "F1" 0.97
+"FG_TMT" "F1" 0.95
+"FG_TMT" "F1" 0.94
+"FG_TMT" "F1" 0.96
+"FG_TMT" "F1" 0.97
+"FG_TMT" "F1" 0.96
+"FG_TMT" "F1" 0.96
+"FG_TMT" "F1" 0.96
+"FG_TMT" "Mcc" 0.95
+"FG_TMT" "Mcc" 0.92
+"FG_TMT" "Mcc" 0.95
+"FG_TMT" "Mcc" 0.93
+"FG_TMT" "Mcc" 0.93
+"FG_TMT" "Mcc" 0.95
+"FG_TMT" "Mcc" 0.96
+"FG_TMT" "Mcc" 0.93
+"FG_TMT" "Mcc" 0.94
+"FG_TMT" "Mcc" 0.95
+"FG_DDA" "F1" 0.87
+"FG_DDA" "F1" 0.86
+"FG_DDA" "F1" 0.89
+"FG_DDA" "F1" 0.89
+"FG_DDA" "F1" 0.88
+"FG_DDA" "F1" 0.88
+"FG_DDA" "F1" 0.9
+"FG_DDA" "F1" 0.88
+"FG_DDA" "F1" 0.9
+"FG_DDA" "F1" 0.86
+"FG_DDA" "Mcc" 0.84
+"FG_DDA" "Mcc" 0.85
+"FG_DDA" "Mcc" 0.87
+"FG_DDA" "Mcc" 0.87
+"FG_DDA" "Mcc" 0.86
+"FG_DDA" "Mcc" 0.85
+"FG_DDA" "Mcc" 0.86
+"FG_DDA" "Mcc" 0.87
+"FG_DDA" "Mcc" 0.86
+"FG_DDA" "Mcc" 0.85
+"MQ_DDA" "F1" 0.89
+"MQ_DDA" "F1" 0.89
+"MQ_DDA" "F1" 0.89
+"MQ_DDA" "F1" 0.86
+"MQ_DDA" "F1" 0.89
+"MQ_DDA" "F1" 0.87
+"MQ_DDA" "F1" 0.88
+"MQ_DDA" "F1" 0.85
+"MQ_DDA" "F1" 0.88
+"MQ_DDA" "F1" 0.88
+"MQ_DDA" "Mcc" 0.85
+"MQ_DDA" "Mcc" 0.86
+"MQ_DDA" "Mcc" 0.86
+"MQ_DDA" "Mcc" 0.85
+"MQ_DDA" "Mcc" 0.87
+"MQ_DDA" "Mcc" 0.85
+"MQ_DDA" "Mcc" 0.86
+"MQ_DDA" "Mcc" 0.83
+"MQ_DDA" "Mcc" 0.85
+"MQ_DDA" "Mcc" 0.86
+"DIANN_DIA" "F1" 0.91
+"DIANN_DIA" "F1" 0.88
+"DIANN_DIA" "F1" 0.88
+"DIANN_DIA" "F1" 0.87
+"DIANN_DIA" "F1" 0.91
+"DIANN_DIA" "F1" 0.9
+"DIANN_DIA" "F1" 0.91
+"DIANN_DIA" "F1" 0.9
+"DIANN_DIA" "F1" 0.88
+"DIANN_DIA" "F1" 0.9
+"DIANN_DIA" "Mcc" 0.88
+"DIANN_DIA" "Mcc" 0.84
+"DIANN_DIA" "Mcc" 0.86
+"DIANN_DIA" "Mcc" 0.84
+"DIANN_DIA" "Mcc" 0.88
+"DIANN_DIA" "Mcc" 0.87
+"DIANN_DIA" "Mcc" 0.86
+"DIANN_DIA" "Mcc" 0.87
+"DIANN_DIA" "Mcc" 0.85
+"DIANN_DIA" "Mcc" 0.87
+"spt_DIA" "F1" 0.91
+"spt_DIA" "F1" 0.88
+"spt_DIA" "F1" 0.9
+"spt_DIA" "F1" 0.91
+"spt_DIA" "F1" 0.92
+"spt_DIA" "F1" 0.91
+"spt_DIA" "F1" 0.9
+"spt_DIA" "F1" 0.92
+"spt_DIA" "F1" 0.92
+"spt_DIA" "F1" 0.92
+"spt_DIA" "Mcc" 0.88
+"spt_DIA" "Mcc" 0.86
+"spt_DIA" "Mcc" 0.88
+"spt_DIA" "Mcc" 0.88
+"spt_DIA" "Mcc" 0.89
+"spt_DIA" "Mcc" 0.85
+"spt_DIA" "Mcc" 0.87
+"spt_DIA" "Mcc" 0.89
+"spt_DIA" "Mcc" 0.88
+"spt_DIA" "Mcc" 0.88

@@ -1,4 +1,4 @@
 "mat1","mat2","abbr1","abbr2","mean","median","t_pval","significance","contrast"
-"1","beta_binomial","edgeR","A","B","-0.0506100264930673","0","9.134481082472e-164","****","beta_binomial-edgeR"
-"2","beta_binomial","plgem","A","C","-0.124693054924238","0","7.70534349540206e-219","****","beta_binomial-plgem"
-"3","edgeR","plgem","B","C","-0.0740830284311706","0","8.96634017521583e-75","****","edgeR-plgem"
+"1","beta_binomial","edgeR","A","B","-0.0449055794717018","0","2.83762186351816e-145","****","beta_binomial-edgeR"
+"2","beta_binomial","plgem","A","C","-0.121324225543689","0","1.80094626442638e-194","****","beta_binomial-plgem"
+"3","edgeR","plgem","B","C","-0.0764186460719877","0","1.45632521149458e-75","****","edgeR-plgem"

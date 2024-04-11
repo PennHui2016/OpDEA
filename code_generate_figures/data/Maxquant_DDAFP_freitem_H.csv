@@ -1,0 +1,23 @@
+0.5241730279898219,frozenset({'dlfq'})
+0.20610687022900764,frozenset({'DEqMS'})
+0.18829516539440203,frozenset({'No_norm'})
+0.17302798982188294,frozenset({'Impseq'})
+0.23918575063613232,frozenset({'limma'})
+0.183206106870229,frozenset({'SeqKNN'})
+0.11450381679389313,frozenset({'bpca'})
+0.26463104325699743,frozenset({'lossf'})
+0.13994910941475827,frozenset({'missForest'})
+0.2595419847328244,frozenset({'Rlr'})
+0.26208651399491095,frozenset({'ROTS'})
+0.16793893129770993,frozenset({'DEP'})
+0.2544529262086514,frozenset({'LFQ'})
+0.12468193384223919,frozenset({'proDA'})
+0.1628498727735369,frozenset({'center.median'})
+0.2010178117048346,frozenset({'top3'})
+0.10687022900763359,"frozenset({'DEqMS', 'dlfq'})"
+0.15776081424936386,"frozenset({'dlfq', 'No_norm'})"
+0.11959287531806616,"frozenset({'limma', 'dlfq'})"
+0.1272264631043257,"frozenset({'dlfq', 'lossf'})"
+0.11959287531806616,"frozenset({'Rlr', 'dlfq'})"
+0.11195928753180662,"frozenset({'dlfq', 'ROTS'})"
+0.10178117048346055,"frozenset({'dlfq', 'DEP'})"

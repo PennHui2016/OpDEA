@@ -139,7 +139,7 @@ run_DEA_mq_ens<-function(wfs, ens_mth, ens_opr, raw, evid, design, logFC_t, qval
       res = res_proDA(mats$exp_mat, norm, imp, logT, designs)
     }else if(dea=='DEqMS'){
       #source('./R/DEqMS_DE.R')
-      counts = get_expression_matrix_fg_dda(raw, evid, design, 'count', python_path)
+      counts = get_expression_matrix_mq_dda(raw, evid, design, 'count', python_path)
       res = res_DEqMS(mats$exp_mat, counts$exp_mat, norm, imp, logT, designs)
     }else if(dea=='plgem'){
       #source('./R/plgem_DE.R')
@@ -221,7 +221,7 @@ run_DEA_diann_ens<-function(wfs, ens_mth, ens_opr, raw, evid, design, logFC_t, q
     }else{
       logT = 'F'
     }
-
+    #browser()
     mats = get_expression_matrix_diann_dia(raw, evid, design, exp, python_path_diann_ens)
 
     ori_mats[[i]]=mats$exp_mat
