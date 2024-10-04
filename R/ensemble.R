@@ -1,5 +1,5 @@
 
-ens_multi_quant<-function(deas, ens_mth, ens_oper){
+ens_multi_quant<-function(deas, ens_mth, operation){
   library(dplyr)
   res1 = deas[[1]]
 
